@@ -6,35 +6,39 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Main {
-    Channel<URL> URLs;
-    Channel<String> candidateURLs;
-    Set<String> visitedURLs;
-    int maxURLs;
 
-    private void readSeed(String fileName) {
+    private static void readSeed(String fileName) {
         //seed
     }
 
-    private void start(String seedFileName, int maxURLs, int numberOfLegs) {
-        this.URLs = new Channel<>();
-        this.candidateURLs = new Channel<>();
-        this.visitedURLs = new HashSet<>();
-        this.maxURLs = maxURLs;
+    public static void crawl(String seedFileName, int maxURLs, int numberOfLegs) {
+        Channel<URL> URLs = new Channel<>();
+        Channel<String> candidateURLs = new Channel<>();
+        Set<String> visitedURLs = new HashSet<>();
         readSeed(seedFileName);
 
         for(int i = 0; i < numberOfLegs; i++) {
             new Thread(new Leg(URLs, candidateURLs)).start();
         }
+        while(visitedURLs.size() < maxURLs) {
+            String candidateURL = candidateURLs.take();
+            if(!visitedURLs.contains(candidateURL)) {
+                visitedURLs.add(candidateURL);
+                URLs.put(new URL(candidateURL));
+            }
+        }
+        candidateURLs.close();
+        candidateURLs.clear();
     }
 
-    public void main (String[] args) {
-        if(args.length != 3) {
+    public static void main (String[] args) {
+        if(args.length != 4) { // needs checking
             System.err.println("argv.length = " + args.length);
         }
 
         String fileName = args[1];
         int maxURLsNumber = Integer.parseInt(args[2]);
         int legsNumber = Integer.parseInt(args[3]);
-        start(fileName, maxURLsNumber, legsNumber);
+        crawl(fileName, maxURLsNumber, legsNumber);
     }
 }
