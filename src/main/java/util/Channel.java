@@ -50,4 +50,8 @@ public class Channel<E> {
         blockingQueue.clear();
     }
 
+    public E[] toArray() {
+        return (E[]) blockingQueue.toArray();
+    }
+
 }

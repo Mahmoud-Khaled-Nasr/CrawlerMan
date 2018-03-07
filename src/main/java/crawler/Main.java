@@ -1,6 +1,7 @@
 package crawler;
 
 import util.Channel;
+import util.Pair;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -12,23 +13,27 @@ public class Main {
     }
 
     public static void crawl(String seedFileName, int maxURLs, int numberOfLegs) {
-        Channel<URL> URLs = new Channel<>();
-        Channel<String> candidateURLs = new Channel<>();
+        Channel<String> URLs = new Channel<>();
+        Channel<Pair<String, Set<String>>> candidateURLSets = new Channel<>();
         Set<String> visitedURLs = new HashSet<>();
         readSeed(seedFileName);
 
-        for(int i = 0; i < numberOfLegs; i++) {
-            new Thread(new Leg(URLs, candidateURLs)).start();
+        for (int i = 0; i < numberOfLegs; i++) {
+            new Thread(new Leg(URLs, candidateURLSets)).start();
         }
-        while(visitedURLs.size() < maxURLs) {
-            String candidateURL = candidateURLs.take();
-            if(!visitedURLs.contains(candidateURL)) {
-                visitedURLs.add(candidateURL);
-                URLs.put(new URL(candidateURL));
+        while (visitedURLs.size() < maxURLs) {
+            Pair<String, Set<String>> candidateURLSet = candidateURLSets.take();
+            for (String url : candidateURLSet.getValue()) {
+                // TODO save graph
+                if (!visitedURLs.contains(url)) {
+                    visitedURLs.add(url);
+                    URLs.put(url);
+                }
+                // TODO save state
             }
         }
-        candidateURLs.close();
-        candidateURLs.clear();
+        candidateURLSets.close();
+        candidateURLSets.clear();
     }
 
     public static void main (String[] args) {
