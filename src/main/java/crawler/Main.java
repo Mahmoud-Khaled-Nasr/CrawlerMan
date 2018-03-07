@@ -1,49 +1,78 @@
 package crawler;
 
-import util.Channel;
 import util.Pair;
+import util.PathGenerator;
 
+import java.io.*;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class Main {
 
-    private static void readSeed(String fileName) {
-        //seed
+    private static List<String> readSeed(String seedFileName) {
+        List<String> urls = new LinkedList<>();
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(seedFileName))) {
+            String line;
+            while((line = bufferedReader.readLine()) != null) {
+                urls.add(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return urls;
     }
 
-    public static void crawl(String seedFileName, int maxURLs, int numberOfLegs) {
-        Channel<String> URLs = new Channel<>();
-        Channel<Pair<String, Set<String>>> candidateURLSets = new Channel<>();
+    public static void crawl(String seedFileName, int maxURLsCount, int numberOfLegs) throws IOException {
+        BlockingQueue<String> URLs = new LinkedBlockingQueue<>(readSeed(seedFileName));
+        BlockingQueue<Pair<String, Set<String>>> candidateURLs = new LinkedBlockingQueue<>();
         Set<String> visitedURLs = new HashSet<>();
-        readSeed(seedFileName);
+        PrintWriter graphEdges = new PrintWriter(PathGenerator.generate("graph.edges"), "UTF-8");
+        maxURLsCount -= URLs.size();
 
         for (int i = 0; i < numberOfLegs; i++) {
-            new Thread(new Leg(URLs, candidateURLSets)).start();
+            new Thread(new Leg(URLs, candidateURLs)).start();
         }
-        while (visitedURLs.size() < maxURLs) {
-            Pair<String, Set<String>> candidateURLSet = candidateURLSets.take();
-            for (String url : candidateURLSet.getValue()) {
-                // TODO save graph
-                if (!visitedURLs.contains(url)) {
-                    visitedURLs.add(url);
-                    URLs.put(url);
+        while (numberOfLegs > 0) {
+            try {
+                Pair<String, Set<String>> candidateURLsSet = candidateURLs.take();
+                if(candidateURLsSet.getKey().equals("")) {
+                    numberOfLegs--;
+                    continue;
                 }
-                // TODO save state
+                for (String url : candidateURLsSet.getValue()) {
+                    graphEdges.println(candidateURLsSet.getKey() + " " + url);
+
+                    if (visitedURLs.size() < maxURLsCount && !visitedURLs.contains(url)) {
+                        visitedURLs.add(url);
+                        URLs.put(url);
+                        if (visitedURLs.size() == maxURLsCount) {
+                            for (int i = 0; i < numberOfLegs; i++) {
+                                URLs.put("");
+                            }
+                        }
+                    }
+                    // TODO save state
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
-        candidateURLSets.close();
-        candidateURLSets.clear();
+        graphEdges.close();
     }
 
-    public static void main (String[] args) {
-        if(args.length != 4) { // needs checking
-            System.err.println("argv.length = " + args.length);
+    public static void main (String[] args) throws IOException {
+        if(args.length != 3) {
+            System.err.println("Usage: crawler <seed_file> <max_URLs_count> <number_of_legs>");
+            System.exit(-1);
         }
 
-        String fileName = args[1];
-        int maxURLsNumber = Integer.parseInt(args[2]);
-        int legsNumber = Integer.parseInt(args[3]);
-        crawl(fileName, maxURLsNumber, legsNumber);
+        String seedFileName = args[0];
+        int maxURLsCount = Integer.parseInt(args[1]);
+        int numberOfLegs = Integer.parseInt(args[2]);
+        crawl(seedFileName, maxURLsCount, numberOfLegs);
     }
 }

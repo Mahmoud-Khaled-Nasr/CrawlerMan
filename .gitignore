@@ -95,3 +95,6 @@ atlassian-ide-plugin.xml
 
 # oh-my-zsh gradle plugin
 .gradletasknamecache
+
+# Output Files
+output_data
