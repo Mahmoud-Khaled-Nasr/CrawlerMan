@@ -30,7 +30,7 @@ public class Main {
         BlockingQueue<String> URLs = new LinkedBlockingQueue<>(readSeed(seedFileName));
         BlockingQueue<Pair<String, Set<String>>> candidateURLs = new LinkedBlockingQueue<>();
         Set<String> visitedURLs = new HashSet<>();
-        PrintWriter graphEdges = new PrintWriter(PathGenerator.generate("graph.edges"), "UTF-8");
+        PrintWriter graphEdges = new PrintWriter(PathGenerator.generate("graph"), "UTF-8");
         maxURLsCount -= URLs.size();
 
         for (int i = 0; i < numberOfLegs; i++) {
@@ -39,12 +39,14 @@ public class Main {
         while (numberOfLegs > 0) {
             try {
                 Pair<String, Set<String>> candidateURLsSet = candidateURLs.take();
-                if(candidateURLsSet.getKey().equals("")) {
+                if (candidateURLsSet.getKey().equals("")) {
                     numberOfLegs--;
                     continue;
                 }
+                graphEdges.println(candidateURLsSet.getKey());
+                graphEdges.println(candidateURLsSet.getValue().size());
                 for (String url : candidateURLsSet.getValue()) {
-                    graphEdges.println(candidateURLsSet.getKey() + " " + url);
+                    graphEdges.println(url);
 
                     if (visitedURLs.size() < maxURLsCount && !visitedURLs.contains(url)) {
                         visitedURLs.add(url);
@@ -55,8 +57,8 @@ public class Main {
                             }
                         }
                     }
-                    // TODO save state
                 }
+                // TODO save state (URLs, visitedURLs)
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

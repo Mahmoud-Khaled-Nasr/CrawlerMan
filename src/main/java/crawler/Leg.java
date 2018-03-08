@@ -32,7 +32,8 @@ public class Leg implements Runnable {
                 }
                 try (PrintWriter file = new PrintWriter(PathGenerator.generate("HTML", String.valueOf(url.hashCode())).toString())) {
                     Document content = Jsoup.connect(url).get();
-                    file.println(content);
+                    file.println(content.select("title").first());
+                    file.println(content.select("body").first());
 
                     Set<String> candidateURLsSet = new HashSet<>();
                     for (Element element : content.select("a[href]")) {
