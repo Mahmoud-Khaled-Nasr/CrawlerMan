@@ -16,10 +16,12 @@ public class Leg implements Runnable {
 
     private BlockingQueue<String> URLs;
     private BlockingQueue<Pair<String, Set<String>>> candidateURLs;
+    private RobotMonitor robotMonitor;
 
-    Leg(BlockingQueue<String> URLs, BlockingQueue<Pair<String, Set<String>>> candidateURLs) {
+    Leg(BlockingQueue<String> URLs, BlockingQueue<Pair<String, Set<String>>> candidateURLs, RobotMonitor robotMonitor) {
         this.URLs = URLs;
         this.candidateURLs = candidateURLs;
+        this.robotMonitor = robotMonitor;
     }
 
     @Override
@@ -37,8 +39,16 @@ public class Leg implements Runnable {
 
                     Set<String> candidateURLsSet = new HashSet<>();
                     for (Element element : content.select("a[href]")) {
-                        candidateURLsSet.add(element.absUrl("href"));
+                        String candidateURL = element.absUrl("href");
+
+                        if (candidateURL.equals("")){
+                            continue;
+                        }
+                        if (robotMonitor.isAllowed(candidateURL)){
+                            candidateURLsSet.add(candidateURL);
+                        }
                     }
+                    //TODO check if the candidateURLsSet is empty
                     candidateURLs.put(new Pair<>(url, candidateURLsSet));
                 } catch (IOException e) {
                     e.printStackTrace();

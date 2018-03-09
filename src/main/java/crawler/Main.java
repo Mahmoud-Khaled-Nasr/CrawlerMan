@@ -31,10 +31,11 @@ public class Main {
         BlockingQueue<Pair<String, Set<String>>> candidateURLs = new LinkedBlockingQueue<>();
         Set<String> visitedURLs = new HashSet<>();
         PrintWriter graphEdges = new PrintWriter(PathGenerator.generate("graph"), "UTF-8");
+        RobotMonitor robotMonitor = new RobotMonitor();
         maxURLsCount -= URLs.size();
 
         for (int i = 0; i < numberOfLegs; i++) {
-            new Thread(new Leg(URLs, candidateURLs)).start();
+            new Thread(new Leg(URLs, candidateURLs, robotMonitor)).start();
         }
         while (numberOfLegs > 0) {
             try {
