@@ -13,15 +13,13 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class Main {
 
-    private static List<String> readSeed(String seedFileName) {
+    private static List<String> readSeed(String seedFileName) throws IOException {
         List<String> urls = new LinkedList<>();
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(seedFileName))) {
             String line;
-            while((line = bufferedReader.readLine()) != null) {
+            while ((line = bufferedReader.readLine()) != null) {
                 urls.add(line);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         return urls;
     }
