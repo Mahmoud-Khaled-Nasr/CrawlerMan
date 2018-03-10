@@ -23,7 +23,7 @@ public class RobotMonitor {
         String baseURL ="";
         try {
             URL temp = new URL(url);
-            baseURL = temp.getProtocol()+ "://" + temp.getHost() + "/robots.txt";
+            baseURL = temp.getProtocol()+ "://" + temp.getHost();
         } catch (MalformedURLException e) {
             System.out.println("Usage: RobotMonitor -> isAllowed Message: Malformed baseURL");
             e.printStackTrace();
@@ -57,7 +57,7 @@ public class RobotMonitor {
         synchronized (key){
             if (robots.get(key) == null){
                 //System.out.println("key of map in if condition is (" + key +")");
-                robots.put(key, fetchRobot(key));
+                robots.put(key, fetchRobot(key + "/robots.txt"));
             }
             //System.out.println("key of map is (" + key +")");
             return robots.get(key);
