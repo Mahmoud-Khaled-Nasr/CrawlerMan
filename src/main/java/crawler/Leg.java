@@ -48,7 +48,7 @@ public class Leg implements Runnable {
                             candidateURLsSet.add(candidateURL);
                         }
                     }
-                    //TODO check if the candidateURLsSet is empty
+                    //TODO Hamdy: check if the candidateURLsSet is empty because all of them can't be crawled because of robots.txt
                     candidateURLs.put(new Pair<>(url, candidateURLsSet));
                 } catch (IOException e) {
                     e.printStackTrace();
