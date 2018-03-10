@@ -28,7 +28,7 @@ public class Main {
         BlockingQueue<String> URLs = new LinkedBlockingQueue<>(readSeed(seedFileName));
         BlockingQueue<Pair<String, Set<String>>> candidateURLs = new LinkedBlockingQueue<>();
         Set<String> visitedURLs = new HashSet<>();
-        PrintWriter graphEdges = new PrintWriter(PathGenerator.generate("graph"), "UTF-8");
+        PrintWriter graphEdges = new PrintWriter(PathGenerator.generate("graph").toFile(), "UTF-8");
         RobotMonitor robotMonitor = new RobotMonitor();
         maxURLsCount -= URLs.size();
 
