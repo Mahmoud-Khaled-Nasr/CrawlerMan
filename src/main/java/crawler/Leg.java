@@ -33,10 +33,16 @@ public class Leg implements Runnable {
                 if (url.equals("")) {
                     break;
                 }
-                try (PrintWriter file = new PrintWriter(PathGenerator.generate("HTML", String.valueOf(url.hashCode())).toString())) {
+                try (PrintWriter file = new PrintWriter(PathGenerator.generate("HTML", String.valueOf(url.hashCode())).toFile())) {
                     Document content = Jsoup.connect(url).get();
-                    file.println(content.select("title").first());
-                    file.println(content.select("body").first());
+                    Element title = content.select("title").first();
+                    if (title != null) {
+                        file.println(title.text());
+                    }
+                    Element body = content.select("body").first();
+                    if (body != null) {
+                        file.println(body.text());
+                    }
 
                     Set<String> candidateURLsSet = new HashSet<>();
                     for (Element element : content.select("a[href]")) {
