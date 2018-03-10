@@ -19,7 +19,7 @@ public class Robot {
         this.allowedRules = new ArrayList<>();
         this.disallowedRules = new ArrayList<>();
         this.baseURLPattern = Pattern.compile(this.baseURL);
-        getRobotsTxt(baseURL);
+        getRobotsTxt(this.baseURL);
     }
 
     private void getRobotsTxt(String baseURL){
@@ -86,20 +86,12 @@ public class Robot {
                 disallowedRules.add(robotRule);
             }
         }
-
-        for (RobotRule robotRule: allowedRules){
-            System.out.println(robotRule.getOption() + " " + robotRule.getRule());
-        }
-        for (RobotRule robotRule: disallowedRules){
-            System.out.println(robotRule.getOption() + " " + robotRule.getRule());
-        }
     }
 
     public boolean isAllowed (String url){
         Matcher matcher = baseURLPattern.matcher(url);
         String relativeURL = matcher.replaceFirst("");
 
-        //TODO check if the rule is applied on the url
         boolean allowed = false, disallowed =false;
         RobotRule allowingRule = null, disallowingRule = null;
         for (RobotRule rule: allowedRules){
@@ -124,6 +116,16 @@ public class Robot {
             return false;
         }else {
             return allowingRule.getRuleRank() > disallowingRule.getRuleRank();
+        }
+    }
+
+    //For testing
+    private void printRules (){
+        for (RobotRule robotRule: allowedRules){
+            System.out.println(robotRule.getOption() + " " + robotRule.getRule());
+        }
+        for (RobotRule robotRule: disallowedRules){
+            System.out.println(robotRule.getOption() + " " + robotRule.getRule());
         }
     }
 

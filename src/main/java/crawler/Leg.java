@@ -45,6 +45,7 @@ public class Leg implements Runnable {
                         if (candidateURL.equals("")){
                             continue;
                         }
+                        //TODO Hamdy: This is the check for robots.txt is this ok??
                         if (robotMonitor.isAllowed(candidateURL)){
                             candidateURLsSet.add(candidateURL);
                         }

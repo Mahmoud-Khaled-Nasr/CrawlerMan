@@ -30,7 +30,12 @@ public class RobotRule {
     }
 
     public static boolean isNeededOption (String rule){
-        String option = rule.substring(0, rule.indexOf(':')).toLowerCase();
+        int colonIndex = rule.indexOf(':');
+        if (colonIndex == -1){
+            //To handle wrong robots.txt malformation
+            return false;
+        }
+        String option = rule.substring(0, colonIndex).toLowerCase();
         return neededOptions.contains(option);
     }
 
