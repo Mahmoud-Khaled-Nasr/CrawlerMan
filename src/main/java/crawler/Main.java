@@ -1,5 +1,6 @@
 package crawler;
 
+import crawler.robot.RobotMonitor;
 import util.Pair;
 import util.PathGenerator;
 
