@@ -21,8 +21,8 @@ dependencies {
     // This dependency is found on compile classpath of this component and consumers.
     compile 'com.google.guava:guava:23.0'
     compile 'org.jsoup:jsoup:1.11.2'
-    compile 'com.panforge:robots:1.2.0'
     compile 'org.apache.opennlp:opennlp-tools:1.8.4'
+    compile 'org.mongodb:mongo-java-driver:3.4.1'
 
     // Use JUnit test framework
     testCompile 'junit:junit:4.12'
