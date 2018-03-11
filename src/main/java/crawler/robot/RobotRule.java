@@ -23,7 +23,7 @@ public class RobotRule {
         return rule;
     }
 
-    public RobotRule(String rule) {
+    RobotRule(String rule) {
         int indexOfColon = rule.indexOf(':');
         this.option = rule.substring(0, indexOfColon).toLowerCase();
         this.rule = rule.substring(indexOfColon + 1, rule.length());

@@ -13,7 +13,7 @@ public class Robot {
     private Pattern baseURLPattern;
 
 
-    public Robot (String userAgent, String baseURL){
+    Robot (String userAgent, String baseURL){
         this.baseURL = baseURL;
         this.userAgent = userAgent;
         this.allowedRules = new ArrayList<>();
