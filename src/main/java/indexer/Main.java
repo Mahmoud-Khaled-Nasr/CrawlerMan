@@ -35,7 +35,7 @@ public class Main {
                 int urlId = url.hashCode();
                 List<String> stemmedWords = stemHTML(urlId);
                 System.out.println(stemmedWords);
-                // TODO add stemmed words to DB
+                // TODO add stemmed words to DB -> (urlId, stemmedWords)
                 int count = Integer.parseInt(bufferedReader.readLine());
                 outDegree.put(urlId, count);
                 inDegree.putIfAbsent(urlId, new LinkedList<>());

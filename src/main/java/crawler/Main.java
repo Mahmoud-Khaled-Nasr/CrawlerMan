@@ -70,8 +70,6 @@ public class Main {
         graphEdges.close();
     }
 
-
-    //TODO handle if the function is terminated in the middle
     private static void saveState (BlockingQueue<String> URLs, Set<String> visitedURLs){
         final String TEMP_CRAWLER_STATE = "temp crawler state";
         File crawlerStateFile = null;
