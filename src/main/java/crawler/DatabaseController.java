@@ -1,25 +1,28 @@
 package crawler;
 
-import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.BlockingQueue;
 
 class DatabaseController {
 
-    static void insertURL(int id, String URL){
-        //TODO insert the URL and id int the URL collection
+    static void loadState(Set<String> URLs, Set<String> visited) {
+        // TODO if exists, load the state form the database.
+        // TODO if not, initialize the "crawlerState" collection
     }
 
-    static void insertState(Queue<String> URLs, Set<String> visited){
-
+    static void crawling(String URL) {
+        // TODO add <URL, state> record to the "crawlerState" collection with state="pending"
     }
 
-    static void getState(BlockingQueue<String> URLs, Set<String> visited){
-        // TODO Get the state from the database
-
+    static void crawled(String URL) {
+        // TODO add/update <URL, state> record to the "crawlerState" collection with state="done"
     }
 
-    static void clearState(){
-
+    static void clearState() {
+        // TODO drop the "crawlerState" collection
     }
+
+    static void sendURL(String url, Set<String> links) {
+        // TODO send the url and its outbound links to the indexer via the "communication" collection
+    }
+
 }
