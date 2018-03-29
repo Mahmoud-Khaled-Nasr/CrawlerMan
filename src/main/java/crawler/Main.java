@@ -5,17 +5,11 @@ import util.Pair;
 import util.PathGenerator;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-
 public class Main {
-
-    private static final String CRAWLER_STATE = "crawler state";
 
     private static List<String> readSeed(String seedFileName) throws IOException {
         List<String> urls = new LinkedList<>();
@@ -29,13 +23,16 @@ public class Main {
     }
 
     public static void crawl(String seedFileName, int maxURLsCount, int numberOfLegs) throws IOException {
-        BlockingQueue<String> URLs = new LinkedBlockingQueue<>(readSeed(seedFileName));
+        BlockingQueue<String> URLs = new LinkedBlockingQueue<>();
         BlockingQueue<Pair<String, Set<String>>> candidateURLs = new LinkedBlockingQueue<>();
         Set<String> visitedURLs = new HashSet<>();
         PrintWriter graphEdges = new PrintWriter(PathGenerator.generate("graph").toFile(), "UTF-8");
         RobotMonitor robotMonitor = new RobotMonitor();
         maxURLsCount -= URLs.size();
-        loadState(URLs, visitedURLs);
+        DatabaseController.getState(URLs, visitedURLs);
+        if (URLs.isEmpty()){
+            URLs.addAll(readSeed(seedFileName));
+        }
 
         for (int i = 0; i < numberOfLegs; i++) {
             new Thread(new Leg(URLs, candidateURLs, robotMonitor)).start();
@@ -62,87 +59,13 @@ public class Main {
                         }
                     }
                 }
-                saveState(URLs, visitedURLs);
+                DatabaseController.insertState(URLs, visitedURLs);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
         graphEdges.close();
-    }
-
-    private static void saveState (BlockingQueue<String> URLs, Set<String> visitedURLs){
-        final String TEMP_CRAWLER_STATE = "temp crawler state";
-        File crawlerStateFile = null;
-        File tempCrawlerStateFile = null;
-        try {
-            crawlerStateFile = PathGenerator.generate(CRAWLER_STATE).toFile();
-            tempCrawlerStateFile = PathGenerator.generate(TEMP_CRAWLER_STATE).toFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        PrintWriter printWriter = null;
-        try {
-            if (crawlerStateFile.exists() && crawlerStateFile.isFile()) {
-                printWriter = new PrintWriter(tempCrawlerStateFile, "UTF-8");
-            } else {
-                printWriter = new PrintWriter(crawlerStateFile, "UTF-8");
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        String[] URLsArray;
-        synchronized (URLs) {
-            URLsArray = URLs.toArray(new String[URLs.size()]);
-        }
-        printWriter.println(URLsArray.length);
-        for (String url: URLsArray){
-            printWriter.println(url);
-        }
-        String[] visitedURLsArray = visitedURLs.toArray(new String[visitedURLs.size()]);
-        printWriter.println(visitedURLs.size());
-        for (String url: visitedURLsArray) {
-            printWriter.println(url);
-        }
-        printWriter.close();
-        if (crawlerStateFile.exists() && crawlerStateFile.isFile()) {
-            try {
-                Files.move(tempCrawlerStateFile.toPath(), crawlerStateFile.toPath(), REPLACE_EXISTING);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private static void loadState (BlockingQueue<String> URLs, Set<String> visitedURLs){
-        File file = null;
-        try {
-            file = PathGenerator.generate(CRAWLER_STATE).toFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Scanner scanner = null;
-        try {
-            scanner = new Scanner(file);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        int URLsSize = scanner.nextInt();
-        try {
-            for (int i = 0; i < URLsSize; i++) {
-                URLs.put(scanner.nextLine());
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        int visitedSetSize = scanner.nextInt();
-        for (int i = 0; i < visitedSetSize; i++) {
-            visitedURLs.add(scanner.nextLine());
-        }
-        scanner.close();
+        DatabaseController.clearState();
     }
 
     public static void main (String[] args) throws IOException {

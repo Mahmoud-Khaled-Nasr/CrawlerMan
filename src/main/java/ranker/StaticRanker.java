@@ -49,7 +49,7 @@ public class StaticRanker {
                 ranks.put(urlId, rank);
             }
         }
-        // TODO save the ranks to DB
+        DatabaseController.updatePageRanks(ranks);
 
         try {
             ObjectOutputStream stream = new ObjectOutputStream(new FileOutputStream(PathGenerator.generate("graph").toFile()));

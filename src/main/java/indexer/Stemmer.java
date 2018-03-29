@@ -29,8 +29,8 @@ public class Stemmer implements Runnable {
                     stemmedWords.add(stemmedWord);
                 }
             }
-            // TODO add stemmed words to DB instead of printing them
-            System.out.println(stemmedWords);
+            // TODO check if it works
+            DatabaseController.updateDocument(urlId, stemmedWords);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -1,3 +1,5 @@
+import util.DatabaseDriver;
+
 import java.io.IOException;
 
 public class App {
@@ -12,6 +14,8 @@ public class App {
         int numberOfLegs = Integer.parseInt(args[2]);
         double dampingFactor = Double.parseDouble(args[3]);
         int pageRankIterations = Integer.parseInt(args[4]);
+
+        DatabaseDriver.initializeDatabase();
 
         crawler.Main.crawl(seedFileName, maxURLsCount, numberOfLegs);
         indexer.Main.index(dampingFactor, pageRankIterations);
