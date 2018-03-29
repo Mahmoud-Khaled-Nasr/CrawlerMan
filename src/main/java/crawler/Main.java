@@ -1,82 +1,104 @@
 package crawler;
 
 import crawler.robot.RobotMonitor;
-import util.Pair;
-import util.PathGenerator;
+import org.jsoup.nodes.Document;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Main {
 
-    private static List<String> readSeed(String seedFileName) throws IOException {
-        List<String> urls = new LinkedList<>();
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(seedFileName))) {
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                urls.add(line);
-            }
-        }
-        return urls;
+    private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
+
+    private static final int NUMBER_OF_THREADS = 5;
+
+    // Services
+    private static final ExecutorService downloadersExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
+    private static final CompletionService<Document> downloadersService = new ExecutorCompletionService<>(downloadersExecutor);
+    private static final ExecutorService saversExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
+    private static final RobotMonitor robotMonitor = new RobotMonitor();
+    private static final Set<String> visitedURLs = new HashSet<>();
+    private static final Set<String> savedURLs = new HashSet<>();
+    private static int remainingURLsCount;
+
+    private synchronized static void submitDownload(String url) {
+        visitedURLs.add(url);
+        DatabaseController.crawling(url);
+        downloadersService.submit(new Downloader(url));
     }
 
-    public static void crawl(String seedFileName, int maxURLsCount, int numberOfLegs) throws IOException {
-        BlockingQueue<String> URLs = new LinkedBlockingQueue<>();
-        BlockingQueue<Pair<String, Set<String>>> candidateURLs = new LinkedBlockingQueue<>();
-        Set<String> visitedURLs = new HashSet<>();
-        PrintWriter graphEdges = new PrintWriter(PathGenerator.generate("graph").toFile(), "UTF-8");
-        RobotMonitor robotMonitor = new RobotMonitor();
-        maxURLsCount -= URLs.size();
-        DatabaseController.getState(URLs, visitedURLs);
-        if (URLs.isEmpty()){
-            URLs.addAll(readSeed(seedFileName));
+    synchronized static void submitNewLink(String link) {
+        if (!visitedURLs.contains(link)
+                && remainingURLsCount > 0
+                && robotMonitor.isAllowed(link)) {
+            submitDownload(link);
+            remainingURLsCount--;
         }
+    }
 
-        for (int i = 0; i < numberOfLegs; i++) {
-            new Thread(new Leg(URLs, candidateURLs, robotMonitor)).start();
-        }
-        while (numberOfLegs > 0) {
-            try {
-                Pair<String, Set<String>> candidateURLsSet = candidateURLs.take();
-                if (candidateURLsSet.getKey().equals("")) {
-                    numberOfLegs--;
-                    continue;
-                }
-                graphEdges.println(candidateURLsSet.getKey());
-                graphEdges.println(candidateURLsSet.getValue().size());
-                for (String url : candidateURLsSet.getValue()) {
-                    graphEdges.println(url);
+    public static void crawl(String seedFileName, int maxURLsCount) throws IOException, InterruptedException {
 
-                    if (visitedURLs.size() < maxURLsCount && !visitedURLs.contains(url)) {
-                        visitedURLs.add(url);
-                        URLs.put(url);
-                        if (visitedURLs.size() == maxURLsCount) {
-                            for (int i = 0; i < numberOfLegs; i++) {
-                                URLs.put("");
-                            }
-                        }
-                    }
+        // Load state
+        Set<String> URLs = new HashSet<>();
+        DatabaseController.loadState(URLs, visitedURLs);
+        maxURLsCount -= visitedURLs.size();
+        if (URLs.isEmpty()) { // Read seed file
+            try (BufferedReader bufferedReader = new BufferedReader(new FileReader(seedFileName))) {
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    URLs.add(line);
                 }
-                DatabaseController.insertState(URLs, visitedURLs);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
         }
-        graphEdges.close();
+
+        // Setup
+        remainingURLsCount = maxURLsCount - URLs.size();
+        for (String url : URLs) {
+            submitDownload(url);
+        }
+
+        // Main loop
+        for (int i = 0; i < maxURLsCount; i++) {
+            Document document;
+            try {
+                document = downloadersService.take().get();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+                remainingURLsCount++;
+                continue;
+            }
+
+            // Normalization
+            String url = document.location();
+            if (savedURLs.contains(url)) {
+                LOGGER.log(Level.INFO,"Ignoring a redirection duplicate " + url);
+                remainingURLsCount++;
+                continue;
+            }
+
+            visitedURLs.add(url);
+            savedURLs.add(url);
+            saversExecutor.execute(new Saver(document));
+        }
+
+        downloadersExecutor.shutdown();
+        assert downloadersExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+        saversExecutor.shutdown();
+        assert saversExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
         DatabaseController.clearState();
     }
 
-    public static void main (String[] args) throws IOException {
-        if(args.length != 3) {
-            System.err.println("Usage: crawler <seed_file> <max_URLs_count> <number_of_legs>");
+    public static void main (String[] args) throws IOException, InterruptedException {
+        if(args.length != 2) {
+            System.err.println("Usage: crawler <seed_file> <max_URLs_count>");
             System.exit(-1);
         }
 
         String seedFileName = args[0];
         int maxURLsCount = Integer.parseInt(args[1]);
-        int numberOfLegs = Integer.parseInt(args[2]);
-        crawl(seedFileName, maxURLsCount, numberOfLegs);
+        crawl(seedFileName, maxURLsCount);
     }
 }
