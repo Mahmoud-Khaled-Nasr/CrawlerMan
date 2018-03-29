@@ -1,6 +1,7 @@
 package util;
 
 import com.mongodb.MongoClient;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.*;
 import org.bson.Document;
@@ -8,26 +9,28 @@ import org.bson.Document;
 import java.util.*;
 
 public class DatabaseDriver {
-    private static MongoDatabase mongoDatabase;
+    public static MongoDatabase mongoDatabase;
     private static final String DB_NAME = "CrawlerManDB";
-    private static final String COMMUNICATION_COLLECTION = "communication"
+    public static final String COMMUNICATION_COLLECTION = "communication"
             , COMMUNICATION_URL = "URL"
             , COMMUNICATION_URL_CHILDREN = "children";
-    private static final String GRAPH_COLLECTION = "graph"
+    public static final String GRAPH_COLLECTION = "graph"
             , GRAPH_URL = "URL"
             , GRAPH_URL_CHILDREN = "children"
             , GRAPH_URL_PARENTS = "parents";
-    private static final String STATE_COLLECTION = "crawlerState"
-            , STATE_VISITED = "visited"
-            , STATE_QUEUE = "queue";
-    private static final String URL_MAP_COLLECTION = "URLMap"
+    public static final String STATE_COLLECTION = "crawlerState"
+            , STATE_URL = "URL"
+            , STATE_URL_STATE = "state"
+            , STATE_PENDING = "pending"
+            , STATE_DONE = "done";
+    public static final String URL_MAP_COLLECTION = "URLMap"
             , URL_MAP_URL = "URL"
             , URL_MAP_ID = "id"
             , URL_MAP_RANK = "rank";
-    private static final String INDEX_COLLECTION = "index"
+    public static final String INDEX_COLLECTION = "index"
             , INDEX_URL_ID = "id"
             , INDEX_WORDS = "words";
-    private static final String INVERTED_INDEX_COLLECTION = "invertedIndex"
+    public static final String INVERTED_INDEX_COLLECTION = "invertedIndex"
             , INVERTED_INDEX_WORD = "word"
             , INVERTED_INDEX_URLS = "URLS"
             , INVERTED_INDEX_URLS_ID = "id"
@@ -76,6 +79,36 @@ public class DatabaseDriver {
 
     }
 
+    public static void dropCollection (String collection){
+        assert collectionExists(collection);
+        mongoDatabase.getCollection(collection).drop();
+    }
+
+    public static void deleteAllRecords (String collection){
+        assert collectionExists(collection);
+        mongoDatabase.getCollection(collection).deleteMany(new Document());
+    }
+
+    public static List<Document> getAllRecords (String collection){
+        assert collectionExists(collection);
+        List<Document>list = new ArrayList<>();
+        for (Document document : mongoDatabase.getCollection(collection).find()){
+            list.add(document);
+        }
+        return list;
+    }
+
+    public static boolean isCollectionEmpty(String collection){
+        assert collectionExists(collection);
+        FindIterable<Document> documents = mongoDatabase.getCollection(collection).find();
+        for (Document document : documents){
+            if (document.getObjectId("_id") == null){
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static void createCommunicationCollection() {
         Document connectionValidator = new Document();
         List<String> requiredList = new ArrayList<>(Arrays.asList(COMMUNICATION_URL, COMMUNICATION_URL_CHILDREN));
@@ -122,19 +155,18 @@ public class DatabaseDriver {
 
     private static void createStateCollection(){
         Document stateValidator = new Document();
-        List<String> requiredList = new ArrayList<>(Arrays.asList(STATE_VISITED, STATE_QUEUE));
+        List<String> requiredList = new ArrayList<>(Arrays.asList(STATE_URL, STATE_URL_STATE));
         stateValidator
                 .append("bsonType", "object")
                 .append("required", requiredList)
                 .append("additionalProperties", false)
                 .append("properties", new Document()
                         .append("_id", new Document())
-                        .append(STATE_QUEUE, new Document()
-                                .append("bsonType", "array")
-                                .append("description", "The unfetched URL"))
-                        .append(STATE_VISITED, new Document()
-                                .append("bsonType", "array")
-                                .append("description", "The crawled URL")));
+                        .append(STATE_URL, new Document()
+                                .append("bsonType", "string"))
+                        .append(STATE_URL_STATE, new Document()
+                                //TODO validate the enum
+                                .append("bsonType", "enum")));
 
        createCollection(STATE_COLLECTION, stateValidator);
     }
@@ -216,7 +248,7 @@ public class DatabaseDriver {
     }
 
 
-    private static boolean collectionExists(final String collection){
+    public static boolean collectionExists(final String collection){
         for (String s : mongoDatabase.listCollectionNames()){
             if (s.equals(collection)){
                 return true;

@@ -6,7 +6,8 @@ import java.util.concurrent.ExecutionException;
 public class App {
     public static void main(String[] args) throws IOException, InterruptedException {
         if(args.length != 4) {
-            System.err.println("Usage: CrawlerMan <seed_file> <max_URLs_count> <number_of_legs>");
+            System.err.println("Usage: CrawlerMan <seed_file> <max_URLs_count> " +
+                    "<number_of_legs> <ranker_number_of_iterations");
             System.exit(-1);
         }
 
@@ -17,7 +18,7 @@ public class App {
 
         DatabaseDriver.initializeDatabase();
 
-        crawler.Main.crawl(seedFileName, maxURLsCount);
-        indexer.Main.index(dampingFactor, pageRankIterations);
+        //crawler.Main.crawl(seedFileName, maxURLsCount);
+        //indexer.Main.index(dampingFactor, pageRankIterations);
     }
 }
