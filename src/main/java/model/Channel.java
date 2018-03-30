@@ -6,18 +6,33 @@ import util.DatabaseDriver;
 
 import java.util.List;
 
-@Entity(DatabaseDriver.COMMUNICATION_COLLECTION)
+@Entity()
 public class Channel {
     @Id
     private ObjectId id;
     @Indexed(unique = true, background = true)
-    public String URL;
+    private String URL;
     @Property
-    public List<String> children;
+    private List<String> children;
 
     public Channel(String URL, List<String> children){
         this.URL = URL;
         this.children = children;
     }
-    public Channel(){}
+
+    public void setURL(String URL) {
+        this.URL = URL;
+    }
+
+    public void setChildren(List<String> children) {
+        this.children = children;
+    }
+
+    public String getURL() {
+        return URL;
+    }
+
+    public List<String> getChildren() {
+        return children;
+    }
 }

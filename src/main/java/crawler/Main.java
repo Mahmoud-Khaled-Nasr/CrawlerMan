@@ -2,6 +2,7 @@ package crawler;
 
 import crawler.robot.RobotMonitor;
 import org.jsoup.nodes.Document;
+import util.DatabaseDriver;
 
 import java.io.*;
 import java.util.*;
@@ -112,6 +113,7 @@ public class Main {
         saversExecutor.shutdown();
         assert saversExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
         DatabaseController.clearState();
+        DatabaseController.closeChannel();
         LOGGER.log(Level.INFO,"Crawler is shutting down normally!");
     }
 
