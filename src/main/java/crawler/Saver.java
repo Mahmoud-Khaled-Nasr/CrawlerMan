@@ -11,12 +11,19 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * The Saver class represents a runnable save task for a document.
+ */
 class Saver implements Runnable {
 
     private static final Logger LOGGER = Logger.getLogger(Saver.class.getName());
 
     private final Document document;
 
+    /**
+     * Constructs an instance of a save task for the given document.
+     * @param document The document to be saved
+     */
     Saver(Document document) {
         this.document = document;
     }

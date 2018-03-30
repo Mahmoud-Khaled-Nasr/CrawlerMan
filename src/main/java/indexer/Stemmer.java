@@ -8,10 +8,17 @@ import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * The Stemmer class represents a runnable stemming task for a document.
+ */
 public class Stemmer implements Runnable {
 
     final private int urlId;
 
+    /**
+     * Constructs an instance of a stemming task for the given document.
+     * @param urlId The ID of the document to be stemmed
+     */
     Stemmer(int urlId) {
         this.urlId = urlId;
     }
@@ -29,7 +36,6 @@ public class Stemmer implements Runnable {
                     stemmedWords.add(stemmedWord);
                 }
             }
-            // TODO check if it works
             DatabaseController.updateDocument(urlId, stemmedWords);
         } catch (IOException e) {
             e.printStackTrace();

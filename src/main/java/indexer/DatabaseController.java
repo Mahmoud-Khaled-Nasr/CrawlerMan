@@ -19,7 +19,7 @@ class DatabaseController {
         DatabaseDriver.insertRecord(DatabaseDriver.URL_MAP_COLLECTION, map);
     }
 
-    static String recieveURL (Set<String> links){
+    static String receiveURL(Set<String> links){
         assert DatabaseDriver.collectionExists(DatabaseDriver.COMMUNICATION_COLLECTION);
         if (! DatabaseDriver.isCollectionEmpty(DatabaseDriver.COMMUNICATION_COLLECTION)){
             Document document = DatabaseDriver.mongoDatabase.getCollection(DatabaseDriver.COMMUNICATION_COLLECTION)

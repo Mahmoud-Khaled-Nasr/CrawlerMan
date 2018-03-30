@@ -4,9 +4,26 @@ import util.PathGenerator;
 
 import java.io.*;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+/**
+ * A class representing the static ranking functionality.
+ * This class is intended to be used as static class with only static methods allowed.
+ */
 public class StaticRanker {
+
+    private static final Logger LOGGER = Logger.getLogger(StaticRanker.class.getName());
+
+    /**
+     * Updates the graph with new links.
+     * @param newLinks The new links to be added/updated
+     * @param dampingFactor The damping factor of the PageRank algorithm
+     * @param pageRankIterations The number of iterations of the PageRank algorithm
+     */
     public static void updateRanks(Map<Integer, Set<Integer>> newLinks, double dampingFactor, int pageRankIterations) {
+
+        LOGGER.log(Level.INFO,"Static Ranker is starting!");
 
         HashMap<Integer, Set<Integer>> inbound;
         HashMap<Integer, Set<Integer>> outbound;
@@ -58,5 +75,7 @@ public class StaticRanker {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        LOGGER.log(Level.INFO,"Static Ranker is shutting down normally!");
     }
 }
