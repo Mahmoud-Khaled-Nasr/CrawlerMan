@@ -19,19 +19,16 @@ class DatabaseController {
         DatabaseDriver.insertRecord(DatabaseDriver.URL_MAP_COLLECTION, map);
     }
 
-    static void recieveURL (String URL, Set<String> links){
+    static String recieveURL (Set<String> links){
         assert DatabaseDriver.collectionExists(DatabaseDriver.COMMUNICATION_COLLECTION);
-        if (DatabaseDriver.isCollectionEmpty(DatabaseDriver.COMMUNICATION_COLLECTION)){
-            URL = null;
-            links = null;
-        }else{
-
+        if (! DatabaseDriver.isCollectionEmpty(DatabaseDriver.COMMUNICATION_COLLECTION)){
             Document document = DatabaseDriver.mongoDatabase.getCollection(DatabaseDriver.COMMUNICATION_COLLECTION)
                     .findOneAndDelete(new Document());
-            URL = document.getString(DatabaseDriver.COMMUNICATION_URL);
             //TODO this line needs testing
-            links = new HashSet<>((ArrayList<String>) document.get(DatabaseDriver.COMMUNICATION_URL_CHILDREN));
+            links.addAll((ArrayList<String>) document.get(DatabaseDriver.COMMUNICATION_URL_CHILDREN));
+            return document.getString(DatabaseDriver.COMMUNICATION_URL);
         }
+        return "";
     }
 
 
