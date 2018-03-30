@@ -7,11 +7,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The Stemmer class represents a runnable stemming task for a document.
  */
 public class Stemmer implements Runnable {
+
+    private static final Logger LOGGER = Logger.getLogger(Stemmer.class.getName());
 
     final private int urlId;
 
@@ -25,6 +29,7 @@ public class Stemmer implements Runnable {
 
     @Override
     public void run() {
+        LOGGER.log(Level.INFO,"Indexing " + urlId);
         try {
             String html = new String(Files.readAllBytes(PathGenerator.generate("HTML", String.valueOf(urlId))));
             String[] words = html.replaceAll("[^\\p{L} ]", " ").toLowerCase().split("\\s+");
@@ -40,5 +45,6 @@ public class Stemmer implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        LOGGER.log(Level.INFO,"Indexed " + urlId);
     }
 }

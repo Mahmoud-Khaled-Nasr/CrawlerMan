@@ -8,7 +8,7 @@ import java.util.List;
 @Entity(cap = @CappedAt(100))
 public class Channel {
     @Id
-    private ObjectId id;
+    public ObjectId id;
     @Indexed(unique = true, background = true)
     private String url;
     @Property

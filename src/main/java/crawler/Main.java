@@ -2,7 +2,6 @@ package crawler;
 
 import crawler.robot.RobotMonitor;
 import org.jsoup.nodes.Document;
-import util.DatabaseDriver;
 
 import java.io.*;
 import java.util.*;
