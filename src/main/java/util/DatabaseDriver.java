@@ -23,18 +23,13 @@ public class DatabaseDriver {
         final Morphia morphia = new Morphia();
 
         morphia.mapPackage(MODEL_PACKAGE);
-        MongoClient mongoConnection = new MongoClient();
 
         // create the Datastore connecting to the default port on the local host
-        datastore = morphia.createDatastore(mongoConnection, DB_NAME);
+        datastore = morphia.createDatastore(new MongoClient(), DB_NAME);
         //TODO check if the mapper option is applied
         MapperOptions mapperOptions = morphia.getMapper().getOptions();
         mapperOptions.setStoreEmpties(true);
         datastore.ensureIndexes();
-        datastore.ensureCaps();
-        mongoConnection.getDatabase(DB_NAME)
-                .runCommand(Document.parse( "{ convertToCapped: 'Channel'size: 18192  }" ));
-        saveRecord(new Channel("", new ArrayList<>()));
     }
 
     public static <T> void saveRecord (T entity){

@@ -1,6 +1,8 @@
+import sun.awt.windows.ThemeReader;
 import util.DatabaseDriver;
 
 import java.io.IOException;
+import java.sql.Time;
 
 /**
  * The main class of the application.
@@ -24,6 +26,11 @@ public class App {
         int pageRankIterations = Integer.parseInt(args[3]);
 
         DatabaseDriver.initializeDatabase();
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         new Thread(() -> {
             try {

@@ -2,6 +2,7 @@ package crawler;
 
 import model.Channel;
 import model.CrawlerState;
+import org.mongodb.morphia.DeleteOptions;
 import org.mongodb.morphia.query.Query;
 import util.DatabaseDriver;
 
@@ -41,7 +42,7 @@ class DatabaseController {
 
     // clear the "crawlerState" collection
     static void clearState() {
-        DatabaseDriver.datastore.delete(CrawlerState.class);
+        DatabaseDriver.datastore.delete(DatabaseDriver.datastore.createQuery(CrawlerState.class));
     }
 
     // send the url and its outbound links to the indexer via the "communication" collection

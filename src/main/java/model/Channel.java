@@ -5,7 +5,7 @@ import org.mongodb.morphia.annotations.*;
 
 import java.util.List;
 
-@Entity(cap = @CappedAt(100))
+@Entity()
 public class Channel {
     @Id
     public ObjectId id;

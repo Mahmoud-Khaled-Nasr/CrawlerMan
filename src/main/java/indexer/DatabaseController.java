@@ -4,6 +4,7 @@ import com.mongodb.CursorType;
 import model.Channel;
 import model.URL;
 import org.mongodb.morphia.query.FindOptions;
+import org.mongodb.morphia.query.Query;
 import util.DatabaseDriver;
 
 import java.util.*;
@@ -23,18 +24,23 @@ class DatabaseController {
         }
     }
 
-    private static Iterator<Channel> channelIterator = null;
-
     static String receiveURL (Set<String> links){
-
-        if(channelIterator == null) {
-            channelIterator = DatabaseDriver.datastore.createQuery(Channel.class)
-                    .fetch(new FindOptions()
-                            .cursorType(CursorType.Tailable));
-            Channel channel = channelIterator.next();
-            assert channel.getURL().equals("");
+        while (DatabaseDriver.datastore.createQuery(Channel.class).count() == 0) {
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
-        Channel channel = channelIterator.next();
+        Channel channel = DatabaseDriver.datastore.createQuery(Channel.class).get();
+        DatabaseDriver.datastore.delete(channel);
+        if (channel.getURL().equals("")
+                && DatabaseDriver.datastore.createQuery(Channel.class).count() == 0){
+            Channel tempChannel = DatabaseDriver.datastore.createQuery(Channel.class).get();
+            DatabaseDriver.datastore.delete(tempChannel);
+            DatabaseDriver.saveRecord(channel);
+            channel = tempChannel;
+        }
         links.addAll(channel.getChildren());
         return channel.getURL();
     }
