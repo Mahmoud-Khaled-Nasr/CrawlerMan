@@ -17,7 +17,7 @@ class DatabaseController {
 
     }
 
-    static String recieveURL (Set<String> links){
+    static String receiveURL (Set<String> links){
         return "";
     }
 }

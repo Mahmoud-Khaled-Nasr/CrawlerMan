@@ -1,13 +1,20 @@
 import util.DatabaseDriver;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
 
+/**
+ * The main class of the application.
+ * Does
+ */
 public class App {
-    public static void main(String[] args) throws IOException, InterruptedException {
+
+    /**
+     * The main method for the application as a whole.
+     * @param args Commandline arguments, must adhere to the restrictions specified
+     */
+    public static void main(String[] args) {
         if(args.length != 4) {
-            System.err.println("Usage: CrawlerMan <seed_file> <max_URLs_count> " +
-                    "<number_of_legs> <ranker_number_of_iterations");
+            System.err.println("Usage: CrawlerMan <seed_file> <max_URLs_count> <damping_factor> <page_rank_iterations> ");
             System.exit(-1);
         }
 
@@ -18,7 +25,14 @@ public class App {
 
         DatabaseDriver.initializeDatabase();
 
-        //crawler.Main.crawl(seedFileName, maxURLsCount);
-        //indexer.Main.index(dampingFactor, pageRankIterations);
+        new Thread(() -> {
+            try {
+                crawler.Main.crawl(seedFileName, maxURLsCount);
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
+
+        new Thread(() -> indexer.Main.index(dampingFactor, pageRankIterations)).start();
     }
 }
