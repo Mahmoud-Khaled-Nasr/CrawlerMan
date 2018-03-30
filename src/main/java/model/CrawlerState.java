@@ -15,25 +15,21 @@ public class CrawlerState {
     private String url;
     private State urlState;
 
-
     public CrawlerState(String url, State urlState){
         this.url = url;
         this.urlState = urlState;
+    }
+
+    public CrawlerState() {
     }
 
     public String getUrl() {
         return url;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
     public State getUrlState() {
         return urlState;
     }
 
-    public void setUrlState(State urlState) {
-        this.urlState = urlState;
-    }
+
 }

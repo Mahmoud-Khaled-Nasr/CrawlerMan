@@ -19,4 +19,7 @@ public class Document {
         this.urlId = urlId;
         this.words = words;
     }
+
+    public Document() {
+    }
 }

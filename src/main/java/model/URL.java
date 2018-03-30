@@ -16,15 +16,12 @@ public class URL {
     private String url;
     private Integer urlRank;
 
-    public URL(Integer urlId, String url, Integer urlRank) {
-        this.urlId = urlId;
-        this.url = url;
-        this.urlRank = urlRank;
-    }
-
     public URL(Integer urlId, String url) {
         this.urlId = urlId;
         this.url = url;
         this.urlRank = 1;
+    }
+
+    public URL() {
     }
 }

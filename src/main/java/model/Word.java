@@ -8,7 +8,7 @@ import org.mongodb.morphia.annotations.Property;
 
 import java.util.List;
 
-@Entity
+@Entity("InvertedIndex")
 public class Word {
     @Id
     private ObjectId _id;
@@ -20,5 +20,8 @@ public class Word {
     public Word(String word, List<Occurrence> occurrences) {
         this.word = word;
         this.occurrences = occurrences;
+    }
+
+    public Word() {
     }
 }

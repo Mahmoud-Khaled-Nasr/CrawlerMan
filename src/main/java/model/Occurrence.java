@@ -8,10 +8,13 @@ import java.security.PrivateKey;
 @Embedded
 public class Occurrence {
     @Property
-    private Integer urlId, TF;
+    private Integer urlId, tf;
 
-    public Occurrence(Integer urlId, Integer TF) {
+    public Occurrence(Integer urlId, Integer tf) {
         this.urlId = urlId;
-        this.TF = TF;
+        this.tf = tf;
+    }
+
+    public Occurrence() {
     }
 }

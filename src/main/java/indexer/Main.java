@@ -33,6 +33,7 @@ public class Main {
         String url;
         while (!(url = DatabaseController.receiveURL(links)).equals("")) {
             int urlId = url.hashCode();
+            DatabaseController.insertURL(urlId, url);
             stemmers.execute(new Stemmer(urlId));
             Set<Integer> linksIds = new HashSet<>();
             for (String link : links) {

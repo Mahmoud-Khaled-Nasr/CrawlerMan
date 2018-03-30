@@ -1,6 +1,9 @@
 package util;
 
+import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
+import model.Channel;
+import org.bson.Document;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 import org.mongodb.morphia.mapping.MapperOptions;
@@ -15,17 +18,23 @@ public class DatabaseDriver {
     public static Datastore datastore;
 
     public static void initializeDatabase(){
+        ;
 
         final Morphia morphia = new Morphia();
 
         morphia.mapPackage(MODEL_PACKAGE);
+        MongoClient mongoConnection = new MongoClient();
 
         // create the Datastore connecting to the default port on the local host
-        datastore = morphia.createDatastore(new MongoClient(), DB_NAME);
+        datastore = morphia.createDatastore(mongoConnection, DB_NAME);
         //TODO check if the mapper option is applied
-        MapperOptions mapperOptions = new MapperOptions();
+        MapperOptions mapperOptions = morphia.getMapper().getOptions();
         mapperOptions.setStoreEmpties(true);
         datastore.ensureIndexes();
+        datastore.ensureCaps();
+        mongoConnection.getDatabase(DB_NAME)
+                .runCommand(Document.parse( "{ convertToCapped: 'Channel'size: 18192  }" ));
+        saveRecord(new Channel("", new ArrayList<>()));
     }
 
     public static <T> void saveRecord (T entity){
