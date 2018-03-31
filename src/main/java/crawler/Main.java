@@ -16,12 +16,10 @@ public class Main {
 
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
 
-    private static final int NUMBER_OF_THREADS = 10;
-
     // Services
-    private static final ExecutorService downloadersExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
-    private static final CompletionService<Document> downloadersService = new ExecutorCompletionService<>(downloadersExecutor);
-    private static final ExecutorService saversExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
+    private static ExecutorService downloadersExecutor;
+    private static CompletionService<Document> downloadersService;
+    private static ExecutorService saversExecutor;
     private static final RobotMonitor robotMonitor = new RobotMonitor();
     private static final Set<String> visitedURLs = new HashSet<>();
     private static final Set<String> savedURLs = new HashSet<>();
@@ -52,9 +50,13 @@ public class Main {
      * @throws IOException If an error occurred during reading the seed file
      * @throws InterruptedException If an external thread interrupted the internal threads
      */
-    public static void crawl(String seedFileName, int maxURLsCount) throws IOException, InterruptedException {
+    public static void crawl(String seedFileName, int maxURLsCount, int numberOfThreads) throws IOException, InterruptedException {
 
         LOGGER.info("Crawler is starting!");
+
+        downloadersExecutor = Executors.newFixedThreadPool(numberOfThreads);
+        downloadersService = new ExecutorCompletionService<>(downloadersExecutor);
+        saversExecutor = Executors.newFixedThreadPool(numberOfThreads);
 
         // Load state
         Set<String> URLs = new HashSet<>();
@@ -114,13 +116,14 @@ public class Main {
      * @param args Commandline arguments, must adhere to the restrictions specified
      */
     public static void main (String[] args) throws IOException, InterruptedException {
-        if(args.length != 2) {
-            System.err.println("Usage: crawler <seed_file> <max_URLs_count>");
+        if(args.length != 3) {
+            System.err.println("Usage: crawler <seed_file> <max_URLs_count> <number_of_threads>");
             System.exit(-1);
         }
 
         String seedFileName = args[0];
         int maxURLsCount = Integer.parseInt(args[1]);
-        crawl(seedFileName, maxURLsCount);
+        int numberOfThreads = Integer.parseInt(args[2]);
+        crawl(seedFileName, maxURLsCount, numberOfThreads);
     }
 }
