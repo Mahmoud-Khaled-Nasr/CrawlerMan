@@ -27,7 +27,6 @@ public class Robot {
         try {
             robotTxtFile = Jsoup.connect(baseURL + "/robots.txt").get().wholeText();
         } catch (IOException e) {
-            //TODO Testing is needed
             //if the robots.txt wasn't found Add Disallow nothing Rule to disallowedRules
             allowedRules.add(new RobotRule(RobotRule.DISALLOW_OPTION + ":"));
         }
@@ -72,7 +71,6 @@ public class Robot {
             }
         }
 
-        //TODO Testing is needed
         if (lastRuleIndex == 0) {
             disallowedRules.add(new RobotRule("disallow:/"));
             return;

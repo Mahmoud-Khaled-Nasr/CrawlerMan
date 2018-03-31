@@ -52,8 +52,6 @@ public class RobotRule {
             return false;
         }
 
-        //TODO replace the w* with [A-Za-z0-9]and [_]
-        //TODO take care of special characters of the regex (?)
         //Handling the * rules: Replace all the * in rule with \w* to work with the Matcher class
         String modifiedRule = rule.replaceAll("\\*", "\\\\\\w*");
         Pattern rulePattern = Pattern.compile(modifiedRule);
