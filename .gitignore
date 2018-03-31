@@ -98,3 +98,6 @@ atlassian-ide-plugin.xml
 
 # Output Files
 output_data
+
+# Seed file
+seed.txt

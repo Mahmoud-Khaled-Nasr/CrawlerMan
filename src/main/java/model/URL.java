@@ -25,7 +25,8 @@ public class URL {
     public URL() {
     }
 
-    public void setUrlRank(Double urlRank) {
-        this.urlRank = urlRank;
+    public String getURL() {
+        return url;
     }
+
 }
