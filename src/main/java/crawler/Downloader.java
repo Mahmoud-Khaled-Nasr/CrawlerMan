@@ -4,7 +4,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.util.concurrent.Callable;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -27,11 +26,11 @@ class Downloader implements Callable<Document> {
     @Override
     public Document call() throws Exception {
         try {
-            LOGGER.log(Level.INFO,"Downloading " + url);
+            LOGGER.info("Downloading " + url);
             return Jsoup.connect(url).get();
         } finally {
             DatabaseController.crawled(url);
-            LOGGER.log(Level.INFO,"Downloaded " + url);
+            LOGGER.info("Downloaded " + url);
         }
     }
 }

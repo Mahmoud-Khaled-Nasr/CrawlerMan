@@ -6,7 +6,6 @@ import org.jsoup.nodes.Document;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -62,7 +61,7 @@ public class Main {
      */
     public static void crawl(String seedFileName, int maxURLsCount) throws IOException, InterruptedException {
 
-        LOGGER.log(Level.INFO,"Crawler is starting!");
+        LOGGER.info("Crawler is starting!");
 
         // Load state
         Set<String> URLs = new HashSet<>();
@@ -89,7 +88,6 @@ public class Main {
             try {
                 document = downloadersService.take().get();
             } catch (ExecutionException e) {
-                e.printStackTrace();
                 remainingURLsCount++;
                 continue;
             }
@@ -97,7 +95,7 @@ public class Main {
             // Normalization
             String url = document.location();
             if (savedURLs.contains(url)) {
-                LOGGER.log(Level.INFO,"Ignoring a redirection duplicate " + url);
+                LOGGER.info("Ignoring a redirection duplicate " + url);
                 remainingURLsCount++;
                 continue;
             }
@@ -113,7 +111,7 @@ public class Main {
         assert saversExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
         DatabaseController.clearState();
         DatabaseController.closeChannel();
-        LOGGER.log(Level.INFO,"Crawler is shutting down normally!");
+        LOGGER.info("Crawler is shutting down normally!");
     }
 
     /**

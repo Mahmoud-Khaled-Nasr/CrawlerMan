@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -31,7 +30,7 @@ class Saver implements Runnable {
     @Override
     public void run() {
         String url = document.location();
-        LOGGER.log(Level.INFO,"Saving " + url);
+        LOGGER.info("Saving " + url);
         try (PrintWriter file = new PrintWriter(PathGenerator.generate("HTML", String.valueOf(url.hashCode())).toFile())) {
 
             Element title = document.select("title").first();
@@ -57,6 +56,6 @@ class Saver implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        LOGGER.log(Level.INFO,"Saved " + url);
+        LOGGER.info("Saved " + url);
     }
 }

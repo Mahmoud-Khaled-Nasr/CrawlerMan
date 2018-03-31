@@ -4,7 +4,6 @@ import util.PathGenerator;
 
 import java.io.*;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -21,9 +20,10 @@ public class StaticRanker {
      * @param dampingFactor The damping factor of the PageRank algorithm
      * @param pageRankIterations The number of iterations of the PageRank algorithm
      */
+    @SuppressWarnings("unchecked") // I hate this line, but the casting is necessary
     public static void updateRanks(Map<Integer, Set<Integer>> newLinks, double dampingFactor, int pageRankIterations) {
 
-        LOGGER.log(Level.INFO,"Static Ranker is starting!");
+        LOGGER.info("Static Ranker is starting!");
 
         HashMap<Integer, Set<Integer>> inbound;
         HashMap<Integer, Set<Integer>> outbound;
@@ -76,6 +76,6 @@ public class StaticRanker {
             e.printStackTrace();
         }
 
-        LOGGER.log(Level.INFO,"Static Ranker is shutting down normally!");
+        LOGGER.info("Static Ranker is shutting down normally!");
     }
 }

@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -29,7 +28,7 @@ public class Stemmer implements Runnable {
 
     @Override
     public void run() {
-        LOGGER.log(Level.INFO,"Indexing " + urlId);
+        LOGGER.info("Indexing " + urlId);
         try {
             String html = new String(Files.readAllBytes(PathGenerator.generate("HTML", String.valueOf(urlId))));
             String[] words = html.replaceAll("[^\\p{L} ]", " ").toLowerCase().split("\\s+");
@@ -45,6 +44,6 @@ public class Stemmer implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        LOGGER.log(Level.INFO,"Indexed " + urlId);
+        LOGGER.info("Indexed " + urlId);
     }
 }

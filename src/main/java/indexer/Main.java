@@ -5,7 +5,6 @@ import ranker.StaticRanker;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -24,7 +23,7 @@ public class Main {
      */
     public static void index(double dampingFactor, int pageRankIterations) {
 
-        LOGGER.log(Level.INFO,"Indexer is starting!");
+        LOGGER.info("Indexer is starting!");
 
         ExecutorService stemmers = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         Map<Integer, Set<Integer>> newLinks = new HashMap<>();
@@ -45,7 +44,7 @@ public class Main {
         stemmers.shutdown();
         StaticRanker.updateRanks(newLinks, dampingFactor, pageRankIterations);
 
-        LOGGER.log(Level.INFO,"Indexer is shutting down normally!");
+        LOGGER.info("Indexer is shutting down normally!");
     }
 
     /**

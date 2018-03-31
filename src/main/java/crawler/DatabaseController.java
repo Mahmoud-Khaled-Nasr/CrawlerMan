@@ -2,7 +2,6 @@ package crawler;
 
 import model.Channel;
 import model.CrawlerState;
-import org.mongodb.morphia.DeleteOptions;
 import org.mongodb.morphia.query.Query;
 import util.DatabaseDriver;
 

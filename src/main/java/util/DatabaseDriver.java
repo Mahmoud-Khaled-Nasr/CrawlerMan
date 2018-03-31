@@ -1,15 +1,12 @@
 package util;
 
-import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
-import model.Channel;
-import org.bson.Document;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 import org.mongodb.morphia.mapping.MapperOptions;
 import org.mongodb.morphia.query.FindOptions;
 
-import java.util.*;
+import java.util.List;
 
 public class DatabaseDriver {
     private static final String DB_NAME = "CrawlerManDB2";
@@ -17,8 +14,7 @@ public class DatabaseDriver {
 
     public static Datastore datastore;
 
-    public static void initializeDatabase(){
-        ;
+    public static void initializeDatabase() {
 
         final Morphia morphia = new Morphia();
 

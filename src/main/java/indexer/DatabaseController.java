@@ -1,10 +1,7 @@
 package indexer;
 
-import com.mongodb.CursorType;
 import model.Channel;
 import model.URL;
-import org.mongodb.morphia.query.FindOptions;
-import org.mongodb.morphia.query.Query;
 import util.DatabaseDriver;
 
 import java.util.*;
@@ -35,7 +32,7 @@ class DatabaseController {
         Channel channel = DatabaseDriver.datastore.createQuery(Channel.class).get();
         DatabaseDriver.datastore.delete(channel);
         if (channel.getURL().equals("")
-                && DatabaseDriver.datastore.createQuery(Channel.class).count() == 0){
+                && DatabaseDriver.datastore.createQuery(Channel.class).count() != 0) {
             Channel tempChannel = DatabaseDriver.datastore.createQuery(Channel.class).get();
             DatabaseDriver.datastore.delete(tempChannel);
             DatabaseDriver.saveRecord(channel);
@@ -44,6 +41,4 @@ class DatabaseController {
         links.addAll(channel.getChildren());
         return channel.getURL();
     }
-
-    //TODO clear the channel
 }
