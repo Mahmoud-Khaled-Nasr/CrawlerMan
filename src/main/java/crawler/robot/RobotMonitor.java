@@ -15,7 +15,6 @@ public class RobotMonitor {
     }
 
     public boolean isAllowed (String url){
-        //System.out.println("URL is (" + url +")");
         String baseURL ="";
         try {
             URL temp = new URL(url);
@@ -24,7 +23,6 @@ public class RobotMonitor {
             System.out.println("Usage: RobotMonitor -> isAllowed Message: Malformed baseURL");
             e.printStackTrace();
         }
-        //System.out.println("baseURL is (" + baseURL +")");
         Robot robot = getRobot(baseURL);
         if (robot == null){
             return true;
@@ -50,18 +48,9 @@ public class RobotMonitor {
         }
         synchronized (key){
             if (robots.get(key) == null){
-                //System.out.println("key of map in if condition is (" + key +")");
                 robots.put(key, new Robot(USER_AGENT, key));
             }
-            //System.out.println("key of map is (" + key +")");
             return robots.get(key);
-        }
-    }
-
-    //For Testing
-    public void printMap (){
-        for (String key : robots.keySet()) {
-            System.out.println(key);
         }
     }
 }

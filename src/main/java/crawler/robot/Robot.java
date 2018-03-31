@@ -86,45 +86,34 @@ public class Robot {
         }
     }
 
-    public boolean isAllowed (String url){
+    public boolean isAllowed (String url) {
         Matcher matcher = baseURLPattern.matcher(url);
         String relativeURL = matcher.replaceFirst("");
 
-        boolean allowed = false, disallowed =false;
+        boolean allowed = false, disallowed = false;
         RobotRule allowingRule = null, disallowingRule = null;
-        for (RobotRule rule: allowedRules){
-            if (rule.pass(relativeURL)){
+        for (RobotRule rule : allowedRules) {
+            if (rule.pass(relativeURL)) {
                 allowingRule = rule;
                 allowed = true;
                 break;
             }
         }
 
-        for (RobotRule rule: disallowedRules){
-            if (rule.pass(relativeURL)){
+        for (RobotRule rule : disallowedRules) {
+            if (rule.pass(relativeURL)) {
                 disallowingRule = rule;
                 disallowed = true;
                 break;
             }
         }
 
-        if (!disallowed){
+        if (!disallowed) {
             return true;
-        }else if (!allowed){
+        } else if (!allowed) {
             return false;
-        }else {
+        } else {
             return allowingRule.getRuleRank() > disallowingRule.getRuleRank();
         }
     }
-
-    //For testing
-    private void printRules (){
-        for (RobotRule robotRule: allowedRules){
-            System.out.println(robotRule.getOption() + " " + robotRule.getRule());
-        }
-        for (RobotRule robotRule: disallowedRules){
-            System.out.println(robotRule.getOption() + " " + robotRule.getRule());
-        }
-    }
-
 }
