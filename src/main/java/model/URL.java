@@ -29,4 +29,11 @@ public class URL {
         return url;
     }
 
+    public Integer getUrlId() {
+        return urlId;
+    }
+
+    public void setUrlRank(Double urlRank) {
+        this.urlRank = urlRank;
+    }
 }
