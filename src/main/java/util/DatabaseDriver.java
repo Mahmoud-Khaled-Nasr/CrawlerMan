@@ -14,7 +14,7 @@ public class DatabaseDriver {
 
     public static Datastore datastore;
 
-    public static void initializeDatabase() {
+    public static void initializeDatabase(){
 
         final Morphia morphia = new Morphia();
 

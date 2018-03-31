@@ -1,9 +1,7 @@
 package indexer;
 
-import model.Channel;
-import model.Document;
-import model.URL;
-import model.Word;
+import model.*;
+import org.mongodb.morphia.FindAndModifyOptions;
 import util.DatabaseDriver;
 
 import java.util.*;
@@ -29,19 +27,21 @@ class DatabaseController {
 
             for (String oldWord : oldWords.keySet()) {
                 Word word = DatabaseDriver.datastore.createQuery(Word.class).field("word").equal(oldWord).get();
-                word.getURLs().remove(urlId);
+                List<Occurrence> occurrences = word.getOccurrences();
+                for (Occurrence occurrence : occurrences) {
+                    if (occurrence.getUrlId().equals(urlId)) {
+                        occurrences.remove(occurrence);
+                        break;
+                    }
+                }
                 DatabaseDriver.saveRecord(word);
             }
         }
-        for(String newWord : newWords.keySet()) {
-            Word word = DatabaseDriver.datastore.createQuery(Word.class).field("word").equal(newWord).get();
-            synchronized (DatabaseDriver.datastore) {
-                if (word == null) {
-                    word = new Word(newWord, new HashMap<>());
-                }
-                word.getURLs().put(urlId, newWords.get(newWord));
-                DatabaseDriver.saveRecord(word);
-            }
+        for (String newWord : newWords.keySet()) {
+            DatabaseDriver.datastore.findAndModify(
+                    DatabaseDriver.datastore.createQuery(Word.class).field("word").equal(newWord),
+                    DatabaseDriver.datastore.createUpdateOperations(Word.class).push("occurrences", new Occurrence(urlId, newWords.get(newWord))),
+                    new FindAndModifyOptions().upsert(true));
         }
     }
 

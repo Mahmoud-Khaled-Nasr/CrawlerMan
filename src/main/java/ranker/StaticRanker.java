@@ -73,6 +73,8 @@ public class StaticRanker {
             }
         }
 
+        LOGGER.info("Updating the database ranks!");
+
         DatabaseController.updatePageRanks(pageRank(inbound, outbound));
 
         try {

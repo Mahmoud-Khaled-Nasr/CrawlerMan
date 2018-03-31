@@ -6,7 +6,8 @@ import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Indexed;
 import org.mongodb.morphia.annotations.Property;
 
-import java.util.Map;
+import java.util.Collections;
+import java.util.List;
 
 @Entity
 public class Word {
@@ -15,17 +16,17 @@ public class Word {
     @Indexed(unique = true, background = true)
     private String word;
     @Property
-    private Map<Integer, Integer> urls;
+    private List<Occurrence> occurrences;
 
-    public Word(String word, Map<Integer, Integer> urls) {
+    public Word(String word) {
         this.word = word;
-        this.urls = urls;
+        this.occurrences = Collections.emptyList();
     }
 
     public Word() {
     }
 
-    public Map<Integer, Integer> getURLs() {
-        return urls;
+    public List<Occurrence> getOccurrences() {
+        return occurrences;
     }
 }

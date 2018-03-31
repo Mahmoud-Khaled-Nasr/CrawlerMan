@@ -9,9 +9,9 @@ class DatabaseController {
 
     static void updatePageRanks(Map<Integer, Double> ranks){
         for (int urlId : ranks.keySet()) {
-            URL url = DatabaseDriver.datastore.createQuery(URL.class).field("urlId").equal(urlId).get();
-            url.setUrlRank(ranks.get(urlId));
-            DatabaseDriver.saveRecord(url);
+            DatabaseDriver.datastore.update(
+                    DatabaseDriver.datastore.createQuery(URL.class).field("urlId").equal(urlId),
+                    DatabaseDriver.datastore.createUpdateOperations(URL.class).set("urlRank", ranks.get(urlId)));
         }
     }
 }
