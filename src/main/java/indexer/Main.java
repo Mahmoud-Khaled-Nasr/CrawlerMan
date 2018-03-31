@@ -18,8 +18,6 @@ public class Main {
     /**
      * The main indexer method.
      * It indexes the new URLs sent by the crawler via the database channel.
-     * @param dampingFactor The damping factor to be passed to the static ranker
-     * @param pageRankIterations The page rank iterations count to be passed to the static ranker
      */
     public static void index() {
 

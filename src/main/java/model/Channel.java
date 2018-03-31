@@ -5,7 +5,7 @@ import org.mongodb.morphia.annotations.*;
 
 import java.util.List;
 
-@Entity()
+@Entity
 public class Channel {
     @Id
     public ObjectId id;

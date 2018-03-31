@@ -5,21 +5,29 @@ import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Indexed;
 
-import java.util.List;
+import java.util.Map;
 
-@Entity("Index")
+@Entity
 public class Document {
     @Id
     private ObjectId _id;
     @Indexed(unique = true, background = true)
     private Integer urlId;
-    private List<String> words;
+    private Map<String, Integer> words;
 
-    public Document(Integer urlId, List<String> words) {
+    public Document(Integer urlId, Map<String, Integer> words) {
         this.urlId = urlId;
         this.words = words;
     }
 
     public Document() {
+    }
+
+    public Map<String, Integer> getWords() {
+        return words;
+    }
+
+    public void setWords(Map<String, Integer> words) {
+        this.words = words;
     }
 }

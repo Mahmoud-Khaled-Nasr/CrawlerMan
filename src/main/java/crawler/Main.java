@@ -28,25 +28,18 @@ public class Main {
     private static int remainingURLsCount;
 
     /**
-     * Submits a link to be downloaded later on.
-     * @param url The URL to be downloaded
-     */
-    private synchronized static void submitDownload(String url) {
-        visitedURLs.add(url);
-        DatabaseController.crawling(url);
-        downloadersService.submit(new Downloader(url));
-    }
-
-    /**
      * Submits a new link to be inspected.
      * The link will be submitted for download if it is allowed and has never been visited before and the crawler still hasn't reached.
      * @param link The link to be inspected
      */
     synchronized static void submitNewLink(String link) {
-        if (!visitedURLs.contains(link)
+        if (!downloadersExecutor.isShutdown()
+                && !visitedURLs.contains(link)
                 && remainingURLsCount > 0
                 && robotMonitor.isAllowed(link)) {
-            submitDownload(link);
+            visitedURLs.add(link);
+            DatabaseController.crawling(link);
+            downloadersService.submit(new Downloader(link));
             remainingURLsCount--;
         }
     }
@@ -77,9 +70,9 @@ public class Main {
         }
 
         // Setup
-        remainingURLsCount = maxURLsCount - URLs.size();
+        remainingURLsCount = maxURLsCount;
         for (String url : URLs) {
-            submitDownload(url);
+            submitNewLink(url);
         }
 
         // Main loop
@@ -88,6 +81,7 @@ public class Main {
             try {
                 document = downloadersService.take().get();
             } catch (ExecutionException e) {
+                maxURLsCount++;
                 remainingURLsCount++;
                 continue;
             }
@@ -96,6 +90,7 @@ public class Main {
             String url = document.location();
             if (savedURLs.contains(url)) {
                 LOGGER.info("Ignoring a redirection duplicate " + url);
+                maxURLsCount++;
                 remainingURLsCount++;
                 continue;
             }

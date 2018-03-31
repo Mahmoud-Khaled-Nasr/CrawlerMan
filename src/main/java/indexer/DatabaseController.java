@@ -1,18 +1,48 @@
 package indexer;
 
 import model.Channel;
+import model.Document;
 import model.URL;
+import model.Word;
 import util.DatabaseDriver;
 
 import java.util.*;
 
 class DatabaseController {
 
-    static void updateDocument(int id, List<String> words){
-        //TODO calc the frequency of words in the list
-        //TODO update words in the Inverted index collection
-        //TODO update the document in the index
+    static void updateDocument(int urlId, List<String> words){
+        Map<String, Integer> newWords = new HashMap<>();
+        for (String word : words) {
+            newWords.put(word, newWords.getOrDefault(word, 0) + 1);
+        }
+        Document document = DatabaseDriver.datastore.createQuery(Document.class).field("urlId").equal(urlId).get();
+        if (document == null) {
+            document = new Document(urlId, newWords);
+            DatabaseDriver.saveRecord(document);
+        } else {
+            Map<String, Integer> oldWords = document.getWords();
+            document.setWords(newWords);
+            DatabaseDriver.saveRecord(document);
 
+            newWords.entrySet().removeAll(oldWords.entrySet());
+            oldWords.entrySet().removeAll(newWords.entrySet());
+
+            for (String oldWord : oldWords.keySet()) {
+                Word word = DatabaseDriver.datastore.createQuery(Word.class).field("word").equal(oldWord).get();
+                word.getURLs().remove(urlId);
+                DatabaseDriver.saveRecord(word);
+            }
+        }
+        for(String newWord : newWords.keySet()) {
+            Word word = DatabaseDriver.datastore.createQuery(Word.class).field("word").equal(newWord).get();
+            synchronized (DatabaseDriver.datastore) {
+                if (word == null) {
+                    word = new Word(newWord, new HashMap<>());
+                }
+                word.getURLs().put(urlId, newWords.get(newWord));
+                DatabaseDriver.saveRecord(word);
+            }
+        }
     }
 
     static void insertURL(int id, String url){
