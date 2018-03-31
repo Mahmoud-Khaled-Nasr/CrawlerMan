@@ -21,7 +21,7 @@ public class Main {
      * @param dampingFactor The damping factor to be passed to the static ranker
      * @param pageRankIterations The page rank iterations count to be passed to the static ranker
      */
-    public static void index(double dampingFactor, int pageRankIterations) {
+    public static void index() {
 
         LOGGER.info("Indexer is starting!");
 
@@ -42,23 +42,15 @@ public class Main {
         }
 
         stemmers.shutdown();
-        StaticRanker.updateRanks(newLinks, dampingFactor, pageRankIterations);
+        StaticRanker.updateRanks(newLinks);
 
         LOGGER.info("Indexer is shutting down normally!");
     }
 
     /**
      * A main method for the indexer to be run independently.
-     * @param args Commandline arguments, must adhere to the restrictions specified
      */
     public static void main (String[] args) {
-        if(args.length != 2) {
-            System.err.println("Usage: indexer <damping_factor> <page_rank_iterations>");
-            System.exit(-1);
-        }
-
-        double dampingFactor = Double.parseDouble(args[0]);
-        int pageRankIterations = Integer.parseInt(args[1]);
-        index(dampingFactor, pageRankIterations);
+        index();
     }
 }

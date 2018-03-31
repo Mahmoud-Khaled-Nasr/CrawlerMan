@@ -14,14 +14,18 @@ public class URL {
     private Integer urlId;
     @Property
     private String url;
-    private Integer urlRank;
+    private Double urlRank;
 
     public URL(Integer urlId, String url) {
         this.urlId = urlId;
         this.url = url;
-        this.urlRank = 1;
+        this.urlRank = 1.0;
     }
 
     public URL() {
+    }
+
+    public void setUrlRank(Double urlRank) {
+        this.urlRank = urlRank;
     }
 }

@@ -14,14 +14,32 @@ public class StaticRanker {
 
     private static final Logger LOGGER = Logger.getLogger(StaticRanker.class.getName());
 
+
+    private static Map<Integer, Double> pageRank(HashMap<Integer, Set<Integer>> inbound, HashMap<Integer, Set<Integer>> outbound) {
+        final double DAMPING_FACTOR = 0.5;
+        final int PAGE_RANK_ITERATIONS = 100;
+
+        Map<Integer, Double> ranks = new HashMap<>();
+        for (int i = 0; i < PAGE_RANK_ITERATIONS; i++) {
+            for (int urlId : outbound.keySet()) {
+                double rank = ranks.getOrDefault(urlId, 1.0);
+                for (int linkId : inbound.getOrDefault(urlId, Collections.emptySet())) {
+                    rank += ranks.getOrDefault(linkId, 1.0) / outbound.get(linkId).size();
+                }
+                // TODO double-check this equation
+                rank = (1 - DAMPING_FACTOR) + DAMPING_FACTOR * rank;
+                ranks.put(urlId, rank);
+            }
+        }
+        return ranks;
+    }
+
     /**
      * Updates the graph with new links.
      * @param newLinks The new links to be added/updated
-     * @param dampingFactor The damping factor of the PageRank algorithm
-     * @param pageRankIterations The number of iterations of the PageRank algorithm
      */
     @SuppressWarnings("unchecked") // I hate this line, but the casting is necessary
-    public static void updateRanks(Map<Integer, Set<Integer>> newLinks, double dampingFactor, int pageRankIterations) {
+    public static void updateRanks(Map<Integer, Set<Integer>> newLinks) {
 
         LOGGER.info("Static Ranker is starting!");
 
@@ -55,18 +73,7 @@ public class StaticRanker {
             }
         }
 
-        Map<Integer, Double> ranks = new HashMap<>();
-        for (int i = 0; i < pageRankIterations; i++) {
-            for (int urlId : outbound.keySet()) {
-                double rank = 0;
-                for (int linkId : inbound.getOrDefault(urlId, Collections.emptySet())) {
-                    rank += ranks.getOrDefault(linkId, 0.0) / outbound.get(linkId).size();
-                }
-                rank = (1 - dampingFactor) + dampingFactor * rank;
-                ranks.put(urlId, rank);
-            }
-        }
-        DatabaseController.updatePageRanks(ranks);
+        DatabaseController.updatePageRanks(pageRank(inbound, outbound));
 
         try {
             ObjectOutputStream stream = new ObjectOutputStream(new FileOutputStream(PathGenerator.generate("graph").toFile()));
