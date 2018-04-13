@@ -1,8 +1,9 @@
 package ranker;
 
-import util.PathGenerator;
+import model.Node;
+import org.mongodb.morphia.query.FindOptions;
+import util.DatabaseDriver;
 
-import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -13,78 +14,96 @@ import java.util.logging.Logger;
 public class StaticRanker {
 
     private static final Logger LOGGER = Logger.getLogger(StaticRanker.class.getName());
+    private static double DAMPING_FACTOR = 0.5;
+    private static int PAGE_RANK_ITERATIONS = 100;
+    private static Double INITIAL_RANK = 1.0;
+    private static Double DEFAULT_RANK = 1 - DAMPING_FACTOR;
+    private static List<Node> graph;
 
-
-    private static Map<Integer, Double> pageRank(HashMap<Integer, Set<Integer>> inbound, HashMap<Integer, Set<Integer>> outbound) {
-        final double DAMPING_FACTOR = 0.5;
-        final int PAGE_RANK_ITERATIONS = 100;
-
-        Map<Integer, Double> ranks = new HashMap<>();
-        for (int i = 0; i < PAGE_RANK_ITERATIONS; i++) {
-            for (int urlId : outbound.keySet()) {
-                double rank = ranks.getOrDefault(urlId, 1.0);
-                for (int linkId : inbound.getOrDefault(urlId, Collections.emptySet())) {
-                    rank += ranks.getOrDefault(linkId, 1.0) / outbound.get(linkId).size();
-                }
-                // TODO double-check this equation
-                rank = (1 - DAMPING_FACTOR) + DAMPING_FACTOR * rank;
-                ranks.put(urlId, rank);
-            }
-        }
-        return ranks;
+    public static void updateRanks (Map<Integer, Set<Integer>> newLinks){
+        LOGGER.info("Static Ranker is starting!");
+        graph = DatabaseDriver.datastore.createQuery(Node.class).asList();
+        updateGraph(newLinks);
+        DatabaseController.updatePageRanks(updateGraphRanks());
+        LOGGER.info("Static Ranker is terminating!");
     }
 
-    /**
-     * Updates the graph with new links.
-     * @param newLinks The new links to be added/updated
-     */
-    @SuppressWarnings("unchecked") // I hate this line, but the casting is necessary
-    public static void updateRanks(Map<Integer, Set<Integer>> newLinks) {
-
-        LOGGER.info("Static Ranker is starting!");
-
-        HashMap<Integer, Set<Integer>> inbound;
-        HashMap<Integer, Set<Integer>> outbound;
+    private static void updateGraph (Map <Integer, Set<Integer>> newLinks){
+        LOGGER.info("updating Graph!");
+        //Get nodes that needs updating
         try {
-            ObjectInputStream stream = new ObjectInputStream(new FileInputStream(PathGenerator.generate("graph").toFile()));
-            inbound = (HashMap<Integer, Set<Integer>>) stream.readObject();
-            outbound = (HashMap<Integer, Set<Integer>>) stream.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            inbound = new HashMap<>();
-            outbound = new HashMap<>();
-        }
+            Set<Integer> newLinksKeySet = newLinks.keySet();
+            Set<Integer> graphChildren = new HashSet<>();
+            List<Node> oldNodes = new LinkedList<>();
 
-        for (int urlId : newLinks.keySet()) {
-            Set<Integer> newOutboundIds = newLinks.get(urlId);
-            Set<Integer> outboundIds = outbound.getOrDefault(urlId, Collections.emptySet());
-            if (!newOutboundIds.equals(outboundIds)) {
-                Set<Integer> addedIds = new HashSet<>(newOutboundIds);
-                addedIds.removeAll(outboundIds);
-                for (int id : addedIds) {
-                    inbound.putIfAbsent(id, new HashSet<>());
-                    inbound.get(id).add(urlId);
+            //TODO Hamdy can i use foreach here?
+            for (int i = 0; i < graph.size(); i++) {
+                Integer id = graph.get(i).getUrlId();
+                graphChildren.add(id);
+                //get the nodes that needs updating
+                if (newLinksKeySet.contains(id)){
+                    oldNodes.add(graph.get(i));
                 }
-                Set<Integer> removedIds = new HashSet<>(outboundIds);
-                removedIds.removeAll(newOutboundIds);
-                for (int id : removedIds) {
-                    inbound.get(id).remove(urlId);
-                }
-                outbound.put(urlId, newOutboundIds);
             }
-        }
+            //check the elements of the children if they exist in the DB or in the keys set of the newLinks
+            graphChildren.addAll(newLinksKeySet);
+            for (Integer link : newLinksKeySet){
+                Set<Integer> children = newLinks.get(link);
+                children.retainAll(graphChildren);
+            }
 
-        LOGGER.info("Updating the database ranks!");
+            //update the existing nodes in the graph
+            for (Node node : oldNodes) {
+                Integer urlId = node.getUrlId();
+                Set<Integer> children = newLinks.get(urlId);
+                oldNodes.get(urlId).setChildren(children);
+                newLinksKeySet.remove(urlId);
+            }
 
-        DatabaseController.updatePageRanks(pageRank(inbound, outbound));
+            List<Node> newNodes = new LinkedList<>();
+            //create new nodes
+            for (Integer urlId : newLinksKeySet) {
+                newNodes.add(new Node(urlId, newLinks.get(urlId)));
+            }
 
-        try {
-            ObjectOutputStream stream = new ObjectOutputStream(new FileOutputStream(PathGenerator.generate("graph").toFile()));
-            stream.writeObject(inbound);
-            stream.writeObject(outbound);
-        } catch (IOException e) {
+            //update the database
+            graph.clear();
+            graph.addAll(newNodes);
+            graph.addAll(oldNodes);
+            DatabaseDriver.datastore.save(graph);
+        }catch (Exception e){
             e.printStackTrace();
         }
 
-        LOGGER.info("Static Ranker is shutting down normally!");
+        LOGGER.info("finish updating Graph!");
+    }
+
+    private static Map<Integer, Double> updateGraphRanks (){
+        LOGGER.info("updating Graph Ranks!");
+        DatabaseDriver.datastore.createQuery(Node.class).asList();
+        Map<Integer, Double> ranks = new HashMap<>();
+        try {
+            //TODO every time static ranker starts is starts from 1 is this right?
+            //set the default ranks to 1
+            for (Node node : graph) {
+                ranks.put(node.getUrlId(), INITIAL_RANK);
+            }
+
+            for (int i = 0; i < PAGE_RANK_ITERATIONS; i++) {
+                LOGGER.info("Loop " + i);
+                for (Node node : graph) {
+                    //TODO not sure from the equation here i think i should multiply with something here
+                    Double parentRank = ranks.get(node.getUrlId()) / node.getChildren().size();
+                    //update the children ranks
+                    for (Integer urlId : node.getChildren()) {
+                        ranks.put(urlId, ranks.get(urlId) + parentRank);
+                    }
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        LOGGER.info("finish updating Graph Ranks!");
+        return ranks;
     }
 }
