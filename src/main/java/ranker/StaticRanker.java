@@ -1,7 +1,6 @@
 package ranker;
 
 import model.Node;
-import org.mongodb.morphia.query.FindOptions;
 import util.DatabaseDriver;
 
 import java.util.*;
@@ -17,7 +16,6 @@ public class StaticRanker {
     private static double DAMPING_FACTOR = 0.5;
     private static int PAGE_RANK_ITERATIONS = 100;
     private static Double INITIAL_RANK = 1.0;
-    private static Double DEFAULT_RANK = 1 - DAMPING_FACTOR;
     private static List<Node> graph;
 
     public static void updateRanks (Map<Integer, Set<Integer>> newLinks){
@@ -79,22 +77,27 @@ public class StaticRanker {
         LOGGER.info("updating Graph Ranks!");
         DatabaseDriver.datastore.createQuery(Node.class).asList();
         Map<Integer, Double> ranks = new HashMap<>();
-        //TODO every time static ranker starts is starts from 1 is this right?
+        Map<Integer, Double> oldRanks = new HashMap<>();
+
         //set the default ranks to 1
         for (Node node : graph) {
-            ranks.put(node.getUrlId(), INITIAL_RANK);
+            oldRanks.put(node.getUrlId(), INITIAL_RANK);
         }
 
         //Calculate the Ranks
         for (int i = 0; i < PAGE_RANK_ITERATIONS; i++) {
-            LOGGER.info("Loop " + i);
             for (Node node : graph) {
-                Double parentRank = DAMPING_FACTOR * (ranks.get(node.getUrlId()) / node.getChildren().size());
+                ranks.put(node.getUrlId(), INITIAL_RANK);
+            }
+            for (Node node : graph) {
+                Double parentRank = DAMPING_FACTOR * (oldRanks.get(node.getUrlId()) / node.getChildren().size());
                 //update the children ranks
                 for (Integer urlId : node.getChildren()) {
                     ranks.put(urlId, ranks.get(urlId) + parentRank);
                 }
             }
+            oldRanks = new HashMap<>();
+            oldRanks.putAll(ranks);
         }
 
         LOGGER.info("finish updating Graph Ranks!");
