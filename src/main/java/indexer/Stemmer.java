@@ -16,7 +16,21 @@ public class Stemmer implements Runnable {
 
     private static final Logger LOGGER = Logger.getLogger(Stemmer.class.getName());
 
+    private static final PorterStemmer porterStemmer = new PorterStemmer();
+
     final private int urlId;
+
+    public static List<String> stem(String text) {
+        String[] words = text.replaceAll("[^\\p{L} ]", " ").toLowerCase().split("\\s+");
+        List<String> stemmedWords = new LinkedList<>();
+        for (String word : words) {
+            String stemmedWord = porterStemmer.stem(word);
+            if (stemmedWord.length() > 1) {
+                stemmedWords.add(stemmedWord);
+            }
+        }
+        return stemmedWords;
+    }
 
     /**
      * Constructs an instance of a stemming task for the given document.
@@ -31,16 +45,7 @@ public class Stemmer implements Runnable {
         LOGGER.info("Indexing " + urlId);
         try {
             String html = new String(Files.readAllBytes(PathGenerator.generate("HTML", String.valueOf(urlId))));
-            String[] words = html.replaceAll("[^\\p{L} ]", " ").toLowerCase().split("\\s+");
-            PorterStemmer porterStemmer = new PorterStemmer();
-            List<String> stemmedWords = new LinkedList<>();
-            for (String word : words) {
-                String stemmedWord = porterStemmer.stem(word);
-                if (stemmedWord.length() > 1) {
-                    stemmedWords.add(stemmedWord);
-                }
-            }
-            DatabaseController.updateDocument(urlId, stemmedWords);
+            DatabaseController.updateDocument(urlId, stem(html));
         } catch (IOException e) {
             e.printStackTrace();
         }
