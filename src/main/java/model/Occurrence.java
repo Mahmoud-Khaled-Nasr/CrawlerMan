@@ -19,4 +19,8 @@ public class Occurrence {
     public Integer getUrlId() {
         return urlId;
     }
+
+    public Integer getCount(){
+        return count;
+    }
 }

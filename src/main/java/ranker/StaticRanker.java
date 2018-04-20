@@ -85,6 +85,7 @@ public class StaticRanker {
 
         //Calculate the Ranks
         for (int i = 0; i < PAGE_RANK_ITERATIONS; i++) {
+            ranks = new HashMap<>();
             for (Node node : graph) {
                 ranks.put(node.getUrlId(), INITIAL_RANK);
             }
@@ -95,8 +96,7 @@ public class StaticRanker {
                     ranks.put(urlId, ranks.get(urlId) + parentRank);
                 }
             }
-            oldRanks = new HashMap<>();
-            oldRanks.putAll(ranks);
+            oldRanks = ranks;
         }
 
         LOGGER.info("finish updating Graph Ranks!");
