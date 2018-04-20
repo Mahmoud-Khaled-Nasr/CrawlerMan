@@ -1,7 +1,6 @@
 package ranker;
 
 import model.Node;
-import util.DatabaseDriver;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -20,7 +19,7 @@ public class StaticRanker {
 
     public static void updateRanks (Map<Integer, Set<Integer>> newLinks){
         LOGGER.info("Static Ranker is starting!");
-        graph = DatabaseDriver.datastore.createQuery(Node.class).asList();
+        graph = DatabaseController.getGraph();
         updateGraph(newLinks);
         DatabaseController.updatePageRanks(updateGraphRanks());
         LOGGER.info("Static Ranker is terminating!");
@@ -68,14 +67,14 @@ public class StaticRanker {
         graph.clear();
         graph.addAll(newNodes);
         graph.addAll(oldNodes);
-        DatabaseDriver.datastore.save(graph);
+        DatabaseController.saveGraph(graph);
 
         LOGGER.info("finish updating Graph!");
     }
 
     private static Map<Integer, Double> updateGraphRanks () {
         LOGGER.info("updating Graph Ranks!");
-        DatabaseDriver.datastore.createQuery(Node.class).asList();
+        graph = DatabaseController.getGraph();
         Map<Integer, Double> ranks = new HashMap<>();
         Map<Integer, Double> oldRanks = new HashMap<>();
 
