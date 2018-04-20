@@ -41,3 +41,15 @@ run {
         args Eval.me(appArgs)
     }
 }
+
+
+task clean_results( type : Exec ) {
+    description 'Remove the HTML files and drop the database'
+    doLast {
+        if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+            commandLine 'echo THIS IS WINDOWS DONOT TRY TO DO THIS'
+        } else {
+            commandLine 'rm output_data/* -r | mongo CrawlerManDB --eval "printjson(db.dropDatabase())"'
+        }
+    }
+}

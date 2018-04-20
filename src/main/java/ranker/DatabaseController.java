@@ -1,5 +1,6 @@
 package ranker;
 
+import model.Node;
 import model.URL;
 import util.DatabaseDriver;
 
@@ -14,5 +15,13 @@ class DatabaseController {
             url.setUrlRank(ranks.get(url.getUrlId()));
         }
         DatabaseDriver.datastore.save(urls);
+    }
+
+    static List<Node> getGraph(){
+        return DatabaseDriver.datastore.createQuery(Node.class).asList();
+    }
+
+    static void saveGraph(List<Node> graph){
+        DatabaseDriver.datastore.save(graph);
     }
 }
