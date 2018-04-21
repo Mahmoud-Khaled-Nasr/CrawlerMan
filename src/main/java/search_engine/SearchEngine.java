@@ -32,7 +32,7 @@ public class SearchEngine {
 
         for (Document document : documents){
             phraseSearch.execute(() -> {
-                try (ObjectInputStream stream = new ObjectInputStream(new FileInputStream(PathGenerator.generate("HTML", String.valueOf(urlId)).toFile()))) {
+                try (ObjectInputStream stream = new ObjectInputStream(new FileInputStream(PathGenerator.generate("HTML", String.valueOf(document.getUrlId())).toFile()))) {
                     String html = ((Map<String, String>) stream.readObject()).get("body");
                     if (html.contains(loweredCaseQuery)){
                         results.add(document);
