@@ -31,6 +31,10 @@ public class Main {
      * @param link The link to be inspected
      */
     synchronized static void submitNewLink(String link) {
+        int hashIndex = link.indexOf("#");
+        if (hashIndex != -1) {
+            link = link.substring(0, hashIndex);
+        }
         if (!downloadersExecutor.isShutdown()
                 && !visitedURLs.contains(link)
                 && remainingURLsCount > 0

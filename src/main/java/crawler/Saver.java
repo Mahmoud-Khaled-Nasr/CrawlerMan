@@ -4,9 +4,12 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import util.PathGenerator;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.ObjectOutputStream;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -31,16 +34,22 @@ class Saver implements Runnable {
     public void run() {
         String url = document.location();
         LOGGER.info("Saving " + url);
-        try (PrintWriter file = new PrintWriter(PathGenerator.generate("HTML", String.valueOf(url.hashCode())).toFile())) {
+        try (ObjectOutputStream stream = new ObjectOutputStream(new FileOutputStream(PathGenerator.generate("HTML", String.valueOf(url.hashCode())).toFile()))) {
 
+            Map<String, String> data = new HashMap<>();
             Element title = document.select("title").first();
             if (title != null) {
-                file.println(title.text());
+                data.put("title", title.text());
+            }
+            Element description = document.select("meta[property=og:description]").first();
+            if (description != null) {
+                data.put("description", description.attr("content"));
             }
             Element body = document.select("body").first();
             if (body != null) {
-                file.println(body.text().toLowerCase());
+                data.put("body", body.text().toLowerCase());
             }
+            stream.writeObject(data);
 
             Set<String> links = new HashSet<>();
             for (Element element : document.select("a[href]")) {

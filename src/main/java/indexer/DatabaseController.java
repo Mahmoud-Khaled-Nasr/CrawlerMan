@@ -8,14 +8,14 @@ import java.util.*;
 
 class DatabaseController {
 
-    static void updateDocument(int urlId, List<String> words){
+    static void updateDocument(int urlId, List<String> words, String title, String description) {
         Map<String, Integer> newWords = new HashMap<>();
         for (String word : words) {
             newWords.put(word, newWords.getOrDefault(word, 0) + 1);
         }
         Document document = DatabaseDriver.datastore.createQuery(Document.class).field("urlId").equal(urlId).get();
         if (document == null) {
-            document = new Document(urlId, newWords);
+            document = new Document(urlId, newWords, title, description);
             DatabaseDriver.saveRecord(document);
         } else {
             Map<String, Integer> oldWords = document.getWords();
