@@ -34,12 +34,12 @@ public class StaticRanker {
         List<Node> oldNodes = new LinkedList<>();
 
         //TODO Hamdy can i use foreach here?
-        for (int i = 0; i < graph.size(); i++) {
-            Integer id = graph.get(i).getUrlId();
+        for (Node node : graph) {
+            Integer id = node.getUrlId();
             graphChildren.add(id);
             //get the nodes that needs updating
             if (newLinksKeySet.contains(id)) {
-                oldNodes.add(graph.get(i));
+                oldNodes.add(node);
             }
         }
         //check the elements of the children if they exist in the DB or in the keys set of the newLinks
@@ -52,8 +52,7 @@ public class StaticRanker {
         //update the existing nodes in the graph
         for (Node node : oldNodes) {
             Integer urlId = node.getUrlId();
-            Set<Integer> children = newLinks.get(urlId);
-            oldNodes.get(urlId).setChildren(children);
+            node.setChildren(newLinks.get(urlId));
             newLinksKeySet.remove(urlId);
         }
 
