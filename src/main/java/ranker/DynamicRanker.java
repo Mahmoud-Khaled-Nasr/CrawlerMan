@@ -1,5 +1,6 @@
 package ranker;
 
+import model.Document;
 import model.Occurrence;
 import model.Word;
 
@@ -7,12 +8,8 @@ import java.util.*;
 
 public class DynamicRanker {
 
-    static public List<Integer> getPhraseUrlsIds (List<String> query) {
-        DatabaseController.getUrlsContainingWords(query);
-
-
-        return null;
-
+    static public List<Document> getPhraseDocuments(List<String> query) {
+        return DatabaseController.getUrlsContainingWords(query);
     }
 
     static public List<Integer> getRankSortedUrls (List<String> query){
@@ -24,15 +21,13 @@ public class DynamicRanker {
             for (Occurrence occurrence : occurrenceList){
                 int urlId = occurrence.getUrlId();
                 Double tf = (double)occurrence.getCount() / DatabaseController.getDocumentLength(urlId);
-                //TODO need to log the number here
-                Double idf = DatabaseController.getTotalNumberOfDocuments() / (double)occurrenceList.size();
-                relevance.put(urlId, relevance.getOrDefault(urlId, 0.0) + tf * idf);
+                Double idf = Math.log(DatabaseController.getTotalNumberOfDocuments() / (double)occurrenceList.size());
+                Double staticRank = DatabaseController.getUrlPageRank(urlId);
+                relevance.put(urlId, relevance.getOrDefault(urlId, 0.0) + tf * idf * staticRank);
             }
         }
 
-        List<Integer> orderedUrlIds = sortRelevanceMap(relevance);
-
-        return orderedUrlIds;
+        return sortRelevanceMap(relevance);
     }
 
     private static List<Integer> sortRelevanceMap (Map<Integer, Double> relevance){

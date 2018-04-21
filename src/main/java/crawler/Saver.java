@@ -39,7 +39,7 @@ class Saver implements Runnable {
             }
             Element body = document.select("body").first();
             if (body != null) {
-                file.println(body.text());
+                file.println(body.text().toLowerCase());
             }
 
             Set<String> links = new HashSet<>();

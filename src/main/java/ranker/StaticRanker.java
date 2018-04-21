@@ -14,7 +14,7 @@ public class StaticRanker {
     private static final Logger LOGGER = Logger.getLogger(StaticRanker.class.getName());
     private static double DAMPING_FACTOR = 0.5;
     private static int PAGE_RANK_ITERATIONS = 100;
-    private static Double INITIAL_RANK = 1.0;
+    private static Double INITIAL_RANK = 1.0 - DAMPING_FACTOR;
     private static List<Node> graph;
 
     public static void updateRanks (Map<Integer, Set<Integer>> newLinks){

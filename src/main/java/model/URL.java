@@ -33,6 +33,10 @@ public class URL {
         return urlId;
     }
 
+    public Double getUrlRank() {
+        return urlRank;
+    }
+
     public void setUrlRank(Double urlRank) {
         this.urlRank = urlRank;
     }

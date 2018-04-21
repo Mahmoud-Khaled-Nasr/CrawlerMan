@@ -51,8 +51,7 @@ class DatabaseController {
         return query.asList();
     }
 
-    static List<String> getUrlsStrings (){
-
-        return new ArrayList<>();
+    static Double getUrlPageRank (Integer urlId){
+        return DatabaseDriver.datastore.createQuery(URL.class).field("urlId").equal(urlId).get().getUrlRank();
     }
 }
