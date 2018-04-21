@@ -5,45 +5,52 @@ import model.Document;
 import ranker.DynamicRanker;
 import util.PathGenerator;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.*;
 
 public class SearchEngine {
-    static List<Document> querySearch (String query){
+    private static Collection<Integer> querySearch (String query){
         query = query.toLowerCase();
         List<String> queryStemmedWords = Stemmer.stem(query);
 
-        List<Integer> urlIds = DynamicRanker.getRankSortedUrls(queryStemmedWords);
-        return DatabaseController.getDocuments(urlIds);
+        return DynamicRanker.getRankSortedUrls(queryStemmedWords);
     }
 
-    @SuppressWarnings("unchecked") // I hate this line, but the casting is necessary
-    static List<Document> phraseSearch (String query) throws InterruptedException {
-        String loweredCaseQuery = query.toLowerCase();
+    private static Collection<Integer> phraseSearch(String query) throws InterruptedException {
         List<String> phraseStemmedWords = Stemmer.stem(query);
         List<Document> documents = DynamicRanker.getPhraseDocuments(phraseStemmedWords);
         ExecutorService phraseSearch = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        BlockingQueue<Document> results = new LinkedBlockingQueue<>();
+        LinkedBlockingQueue<Integer> results = new LinkedBlockingQueue<>();
 
         for (Document document : documents){
+            int urlId = document.getUrlId();
             phraseSearch.execute(() -> {
-                try (ObjectInputStream stream = new ObjectInputStream(new FileInputStream(PathGenerator.generate("HTML", String.valueOf(document.getUrlId())).toFile()))) {
-                    String html = ((Map<String, String>) stream.readObject()).get("body");
-                    if (html.contains(loweredCaseQuery)){
-                        results.add(document);
+                try {
+                    String html = new String(Files.readAllBytes(PathGenerator
+                            .generate("HTML", String.valueOf(urlId))));
+                    if (html.toLowerCase().contains(query.toLowerCase())){
+                        results.add(urlId);
                     }
-                } catch (IOException | ClassNotFoundException e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             });
         }
         phraseSearch.shutdown();
         assert phraseSearch.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
-        return Arrays.asList(results.toArray(new Document[results.size()]));
+        return results;
+    }
+
+    // TODO better logic!
+    public static Collection<Integer> search (String query) throws InterruptedException {
+        if(query.startsWith("\"") && query.endsWith("\"")) {
+            return phraseSearch(query.substring(0, query.length()-2));
+        } else {
+            return querySearch(query);
+        }
     }
 }

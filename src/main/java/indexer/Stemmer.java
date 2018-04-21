@@ -3,12 +3,10 @@ package indexer;
 import opennlp.tools.stemmer.PorterStemmer;
 import util.PathGenerator;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -26,7 +24,7 @@ public class Stemmer implements Runnable {
         String[] words = text.replaceAll("[^\\p{L} ]", " ").toLowerCase().split("\\s+");
         List<String> stemmedWords = new LinkedList<>();
         for (String word : words) {
-            String stemmedWord = porterStemmer.stem(word);
+            String stemmedWord = porterStemmer.stem(word.toLowerCase());
             if (stemmedWord.length() > 1) {
                 stemmedWords.add(stemmedWord);
             }
@@ -43,13 +41,12 @@ public class Stemmer implements Runnable {
     }
 
     @Override
-    @SuppressWarnings("unchecked") // I hate this line, but the casting is necessary
     public void run() {
         LOGGER.info("Indexing " + urlId);
-        try (ObjectInputStream stream = new ObjectInputStream(new FileInputStream(PathGenerator.generate("HTML", String.valueOf(urlId)).toFile()))) {
-            Map<String, String> document = (Map<String, String>) stream.readObject();
-            DatabaseController.updateDocument(urlId, stem(document.get("body")), document.get("title"), document.get("description"));
-        } catch (IOException | ClassNotFoundException e) {
+        try {
+            String html = new String(Files.readAllBytes(PathGenerator.generate("HTML", String.valueOf(urlId))));
+            DatabaseController.updateDocument(urlId, stem(html));
+        } catch (IOException e) {
             e.printStackTrace();
         }
         LOGGER.info("Indexed " + urlId);

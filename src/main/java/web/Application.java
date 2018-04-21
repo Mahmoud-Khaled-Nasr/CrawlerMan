@@ -1,5 +1,9 @@
+package web;
+
 import model.URL;
 import org.mongodb.morphia.query.FindOptions;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import util.DatabaseDriver;
 
 import java.io.FileNotFoundException;
@@ -7,11 +11,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-/**
- * The main class of the application.
- * Does
- */
-public class App {
+@SpringBootApplication
+public class Application {
 
     /**
      * The main method for the application as a whole.
@@ -40,6 +41,8 @@ public class App {
 
         Thread indexerThread = new Thread(indexer.Main::index);
 
+        SpringApplication.run(Application.class);
+
         crawlerThread.start();
         indexerThread.start();
         crawlerThread.join();
@@ -56,4 +59,5 @@ public class App {
             }
         }
     }
+
 }

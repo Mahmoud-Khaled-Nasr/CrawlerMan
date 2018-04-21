@@ -16,14 +16,10 @@ public class Document {
     private Integer urlId;
     @Property
     private Map<String, Integer> words;
-    @Property
-    private String title, description;
 
-    public Document(Integer urlId, Map<String, Integer> words, String title, String description) {
+    public Document(Integer urlId, Map<String, Integer> words) {
         this.urlId = urlId;
         this.words = words;
-        this.title = title;
-        this.description = description;
     }
 
     public Document() {
@@ -35,14 +31,6 @@ public class Document {
 
     public Map<String, Integer> getWords() {
         return words;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getDescription() {
-        return description;
     }
 
     public void setWords(Map<String, Integer> words) {
