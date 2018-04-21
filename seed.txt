@@ -1,2 +1,6 @@
-https://www.google.com/
-https://spring.io/
+https://www.imdb.com/
+https://www.tomshardware.com/
+https://www.quora.com/
+https://en.wikipedia.org/wiki/Computer
+https://en.wikipedia.org/wiki/Portal:Science
+https://en.wikipedia.org/wiki/Portal:Mathematics
