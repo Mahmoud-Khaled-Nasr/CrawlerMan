@@ -1,13 +1,14 @@
 package search_engine;
 
 import model.Document;
+import model.URL;
 import util.DatabaseDriver;
 
 import java.util.List;
 
 public class DatabaseController {
 
-    static List<Document> getDocuments (List<Integer> urlIds){
-        return DatabaseDriver.datastore.createQuery(Document.class).field("urlId").in(urlIds).asList();
+    static List<URL> getUrls (List<Integer> urls){
+        return DatabaseDriver.datastore.createQuery(URL.class).field("urlId").in(urls).asList();
     }
 }
