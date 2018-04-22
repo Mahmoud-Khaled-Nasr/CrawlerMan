@@ -9,9 +9,13 @@ public class DatabaseDriver {
     private static final String DB_NAME = "CrawlerManDB2";
     private static final String MODEL_PACKAGE = "model";
 
-    public static Datastore datastore;
+    public static Datastore datastore = null;
 
-    public static void initializeDatabase(){
+    public static void initializeDatabase() {
+
+        if (datastore != null) {
+            return;
+        }
 
         final Morphia morphia = new Morphia();
 

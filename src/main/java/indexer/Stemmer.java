@@ -17,11 +17,10 @@ public class Stemmer implements Runnable {
 
     private static final Logger LOGGER = Logger.getLogger(Stemmer.class.getName());
 
-    private static final PorterStemmer porterStemmer = new PorterStemmer();
-
     final private int urlId;
 
     public static List<String> stem(String text) {
+        PorterStemmer porterStemmer = new PorterStemmer();
 
         String[] words = text.replaceAll("[^\\p{L} ]", " ").toLowerCase().split("\\s+");
         List<String> stemmedWords = new LinkedList<>();

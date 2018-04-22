@@ -1,0 +1,29 @@
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <title>Crawler Man</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://stackpath.bootstrapcdn.com/bootswatch/4.1.0/cyborg/bootstrap.min.css" rel="stylesheet" integrity="sha384-5KpNAytmiDxBanrkBv7mxkrUV1uggYCd+nLTGVig8i0ubJLVBFWQKXnGK5nR4kJF" crossorigin="anonymous">
+  </head>
+  <body>
+    <form action="/search" method="post" id="searchForm">
+      <input class="form-control" type="text" name="query" placeholder="Enter search query">
+    </form>
+    <div>
+      <ul class="pagination">
+      </ul>
+    </div>
+    <script src="http://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E=" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.bundle.min.js" integrity="sha384-lZmvU/TzxoIQIOD9yQDEpvxp6wEU32Fy0ckUgOH4EIlMOCdR823rg4+3gWRwnX1M" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.2/jquery.form.min.js" integrity="sha384-FzT3vTVGXqf7wRfy8k4BiyzvbNfeYjK+frTVqZeNDFl8woCbF0CYG6g2fMEFFo/i" crossorigin="anonymous"></script>
+    <script>
+    $(function() {
+      $('#searchForm').ajaxForm(function(result) {
+        alert(result);
+      });
+    });
+    </script>
+  </body>
+</html>
