@@ -5,6 +5,7 @@ import util.PathGenerator;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -21,15 +22,22 @@ public class Stemmer implements Runnable {
     final private int urlId;
 
     public static List<String> stem(String text) {
+
         String[] words = text.replaceAll("[^\\p{L} ]", " ").toLowerCase().split("\\s+");
         List<String> stemmedWords = new LinkedList<>();
-        for (String word : words) {
-            String stemmedWord = porterStemmer.stem(word.toLowerCase());
-            if (stemmedWord.length() > 1) {
-                stemmedWords.add(stemmedWord);
+        String stemmedWord;
+            for (String word : words) {
+                try {
+                    stemmedWord = porterStemmer.stem(word.toLowerCase());
+                }catch (ArrayIndexOutOfBoundsException e){
+                    LOGGER.warning("The stemmer bug at " + word);
+                    continue;
+                }
+                if (stemmedWord.length() > 1 ) {
+                    stemmedWords.add(stemmedWord);
+                }
             }
-        }
-        return stemmedWords;
+            return stemmedWords;
     }
 
     /**
