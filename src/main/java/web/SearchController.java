@@ -1,8 +1,8 @@
 package web;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import search_engine.Result;
 import search_engine.SearchEngine;
 
@@ -11,8 +11,8 @@ import java.util.Collection;
 @RestController
 public class SearchController {
 
-    @RequestMapping("/search")
-    public Collection<Result> search(@RequestParam("query") String query) throws InterruptedException {
-        return SearchEngine.search(query);
+    @PostMapping("/search")
+    public Collection<Result> search(@RequestParam(value = "query") String query, @RequestParam(value = "page", defaultValue="0") int page) throws InterruptedException {
+        return SearchEngine.search(query, page);
     }
 }
