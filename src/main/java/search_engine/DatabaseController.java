@@ -8,7 +8,7 @@ import java.util.List;
 
 public class DatabaseController {
 
-    static List<URL> getUrls (List<Integer> urls){
+    static List<URL> getUrls (Iterable<Integer> urls){
         return DatabaseDriver.datastore.createQuery(URL.class).field("urlId").in(urls).asList();
     }
 }

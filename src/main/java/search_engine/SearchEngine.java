@@ -14,15 +14,15 @@ import java.util.List;
 import java.util.concurrent.*;
 
 public class SearchEngine {
-    private static List<Result> querySearch (String query){
+    private static List<URL> querySearch (String query){
         query = query.toLowerCase();
         List<String> queryStemmedWords = Stemmer.stem(query);
 
         List<Integer> resultUrls = DynamicRanker.getRankSortedUrls(queryStemmedWords);
-        return getSearchResults(DatabaseController.getUrls(resultUrls));
+        return DatabaseController.getUrls(resultUrls);
     }
 
-    private static List<Result> phraseSearch(String query) throws InterruptedException {
+    private static List<URL> phraseSearch(String query) throws InterruptedException {
         List<String> phraseStemmedWords = Stemmer.stem(query);
         List<Document> documents = DynamicRanker.getPhraseDocuments(phraseStemmedWords);
         ExecutorService phraseSearch = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
@@ -44,26 +44,29 @@ public class SearchEngine {
         }
         phraseSearch.shutdown();
         assert phraseSearch.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
-        return getSearchResults(DatabaseController
-                .getUrls(Arrays.asList(resultsIds.toArray(new Integer[resultsIds.size()]))));
+        return DatabaseController.getUrls(resultsIds);
 
     }
 
     // TODO better logic!
-    public static List<Result> search (String query) throws InterruptedException {
+    public static List<Result> search (String query, int page) throws InterruptedException {
+        final int PAGE_SIZE = 10;
+        List<URL> urls;
+        List<Result> pagedResults = new LinkedList<>();
         if(query.startsWith("\"") && query.endsWith("\"")) {
-            return phraseSearch(query.substring(0, query.length()-2));
+            urls = phraseSearch(query.substring(1, query.length()-2));
         } else {
-            return querySearch(query);
+            urls = querySearch(query);
         }
+        for (int i = page * PAGE_SIZE; i < urls.size() && i < page * PAGE_SIZE + PAGE_SIZE; i++) {
+            pagedResults.add(getResultFromURL(urls.get(i)));
+        }
+        return pagedResults;
     }
 
-    private static List<Result> getSearchResults (List<URL> urls){
-        List<Result> results = new LinkedList<>();
-        for (URL url : urls){
-            //TODO Change the title and snipped
-            results.add(new Result("", url.getURL(), ""));
-        }
-        return results;
+    private static Result getResultFromURL (URL url){
+        //TODO Change the title and snipped
+        //TODO get the string of the snippet from the file
+        return new Result("", url.getURL(), "");
     }
 }
