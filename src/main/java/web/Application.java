@@ -31,6 +31,15 @@ public class Application {
 
         util.DatabaseDriver.initializeDatabase();
 
+        SpringApplication.run(Application.class);
+
+        update(seedFileName, maxURLsCount, numberOfThreads);
+    }
+
+
+    private static void update(String seedFileName, int maxURLsCount, int numberOfThreads) throws InterruptedException, FileNotFoundException {
+
+        // Run Crawler
         Thread crawlerThread = new Thread(() -> {
             try {
                 crawler.Main.crawl(seedFileName, maxURLsCount, numberOfThreads);
@@ -39,19 +48,16 @@ public class Application {
             }
         });
 
+        // Run Indexer
         Thread indexerThread = new Thread(indexer.Main::index);
 
-        SpringApplication.run(Application.class);
-
+        // Waiting for them to finish
         crawlerThread.start();
         indexerThread.start();
         crawlerThread.join();
         indexerThread.join();
 
-        updateSeeds(seedFileName, maxURLsCount);
-    }
-
-    private static void updateSeeds(String seedFileName, int maxURLsCount) throws FileNotFoundException {
+        // Update seeds
         List<URL> urls = DatabaseDriver.datastore.createQuery(model.URL.class).order("urlRank").asList(new FindOptions().limit(maxURLsCount / 4));
         try (PrintWriter file = new PrintWriter(seedFileName)) {
             for (URL url : urls) {
