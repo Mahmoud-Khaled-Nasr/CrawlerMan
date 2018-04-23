@@ -26,7 +26,7 @@ public class Main {
 
         updateDocumentsDaemon = Executors.newSingleThreadExecutor();
 
-        ExecutorService stemmers = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        ExecutorService stemmers = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() / 2);
         Map<Integer, Set<Integer>> newLinks = new HashMap<>();
 
         Set<String> links = new HashSet<>();
