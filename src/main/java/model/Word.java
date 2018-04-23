@@ -8,6 +8,7 @@ import org.mongodb.morphia.annotations.Embedded;
 
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 @Entity
@@ -21,10 +22,18 @@ public class Word {
 
     public Word(String word) {
         this.word = word;
-        this.occurrences = Collections.emptyList();
+        this.occurrences = new LinkedList<>();
     }
 
     public Word() {
+    }
+
+    public void addNewOccurrence(Occurrence occurrence){
+        occurrences.add(occurrence);
+    }
+
+    public String getWord() {
+        return word;
     }
 
     public List<Occurrence> getOccurrences() {
