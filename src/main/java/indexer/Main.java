@@ -39,6 +39,7 @@ public class Main {
             newLinks.put(urlId, linksIds);
         }
 
+        LOGGER.info("Indexer is trying to shut down normally!");
         stemmers.shutdown();
         StaticRanker.updateRanks(newLinks);
 

@@ -58,7 +58,7 @@ public class Main {
 
         LOGGER.info("Crawler is starting!");
 
-        downloadersExecutor = Executors.newFixedThreadPool(numberOfThreads);
+        downloadersExecutor = Executors.newFixedThreadPool(numberOfThreads / 2);
         downloadersService = new ExecutorCompletionService<>(downloadersExecutor);
         saversExecutor = Executors.newFixedThreadPool(numberOfThreads);
 
@@ -106,6 +106,7 @@ public class Main {
             saversExecutor.execute(new Saver(document));
         }
 
+        LOGGER.info("Crawler is trying to shut down normally!");
         downloadersExecutor.shutdown();
         assert downloadersExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
         saversExecutor.shutdown();
