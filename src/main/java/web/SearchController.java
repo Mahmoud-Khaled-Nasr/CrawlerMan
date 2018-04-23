@@ -5,14 +5,18 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import search_engine.SearchEngine;
+import util.PathGenerator;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 
 @RestController
 public class SearchController {
 
     @PostMapping("/search")
-    public Map<String, Object> search(@RequestParam(value = "query") String query, @RequestParam(value = "page", defaultValue="0") int page) throws InterruptedException {
+    public Map<String, Object> search(@RequestParam(value = "query") String query, @RequestParam(value = "page", defaultValue="0") int page) throws InterruptedException, IOException {
         if(page > 0) {
             page--;
         }
@@ -31,9 +35,11 @@ public class SearchController {
         return response;
     }
 
-    private static Result getResultFromURL (URL url){
-            //TODO Change the title and snipped
-        //TODO get the string of the snippet from the file
-        return new Result(String.valueOf(url.getUrlId()), url.getURL(), String.valueOf(url.getUrlRank()));
+    private static Result getResultFromURL (URL url) throws IOException {
+        try (BufferedReader file = new BufferedReader(new FileReader(PathGenerator.generate("HTML", String.valueOf(url.getUrlId())).toFile()))) {
+            String title = file.readLine();
+            String snippet = url.getURL();
+            return new Result(title, url.getURL(), snippet);
+        }
     }
 }

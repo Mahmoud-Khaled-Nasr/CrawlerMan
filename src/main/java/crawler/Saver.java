@@ -36,6 +36,8 @@ class Saver implements Runnable {
             Element title = document.select("title").first();
             if (title != null) {
                 file.println(title.text());
+            } else {
+                file.println(url);
             }
             Element body = document.select("body").first();
             if (body != null) {
