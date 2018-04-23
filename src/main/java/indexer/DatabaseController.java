@@ -1,14 +1,13 @@
 package indexer;
 
 import model.*;
-import org.mongodb.morphia.FindAndModifyOptions;
 import util.DatabaseDriver;
 
 import java.util.*;
 
 class DatabaseController {
 
-    synchronized static void updateDocument(int urlId, List<String> words) {
+    static void updateDocument(int urlId, List<String> words) {
         Map<String, Integer> countedWords = new HashMap<>();
         //Count the frequency of a word in document
         for (String word : words) {
@@ -94,45 +93,6 @@ class DatabaseController {
             DatabaseDriver.saveRecord(createdWords);
             DatabaseDriver.saveRecord(updatedWords);
             DatabaseDriver.saveRecord(existingNewDocumentWords);
-        }
-    }
-
-    static void updateDocument2(int urlId, List<String> words) {
-        Map<String, Integer> newWords = new HashMap<>();
-        //Count the frequency of a word in document
-        for (String word : words) {
-            newWords.put(word, newWords.getOrDefault(word, 0) + 1);
-        }
-        Document document = DatabaseDriver.datastore.createQuery(Document.class).field("urlId").equal(urlId).get();
-        //The document
-        if (document == null) {
-            document = new Document(urlId, newWords);
-            DatabaseDriver.saveRecord(document);
-        } else {
-            Map<String, Integer> oldWords = document.getWords();
-            document.setWords(newWords);
-            DatabaseDriver.saveRecord(document);
-
-            newWords.entrySet().removeAll(oldWords.entrySet());
-            oldWords.entrySet().removeAll(newWords.entrySet());
-
-            for (String oldWord : oldWords.keySet()) {
-                Word word = DatabaseDriver.datastore.createQuery(Word.class).field("word").equal(oldWord).get();
-                List<Occurrence> occurrences = word.getOccurrences();
-                for (Occurrence occurrence : occurrences) {
-                    if (occurrence.getUrlId().equals(urlId)) {
-                        occurrences.remove(occurrence);
-                        break;
-                    }
-                }
-                DatabaseDriver.saveRecord(word);
-            }
-        }
-        for (String newWord : newWords.keySet()) {
-            DatabaseDriver.datastore.findAndModify(
-                    DatabaseDriver.datastore.createQuery(Word.class).field("word").equal(newWord),
-                    DatabaseDriver.datastore.createUpdateOperations(Word.class).push("occurrences", new Occurrence(urlId, newWords.get(newWord))),
-                    new FindAndModifyOptions().upsert(true));
         }
     }
 

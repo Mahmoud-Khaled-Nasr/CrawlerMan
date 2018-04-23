@@ -5,7 +5,6 @@ import util.PathGenerator;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -52,7 +51,7 @@ public class Stemmer implements Runnable {
         LOGGER.info("Indexing " + urlId);
         try {
             String html = new String(Files.readAllBytes(PathGenerator.generate("HTML", String.valueOf(urlId))));
-            DatabaseController.updateDocument(urlId, stem(html));
+            Main.updateDocument(urlId, stem(html));
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -9,7 +9,7 @@ import java.util.List;
 public class Channel {
     @Id
     public ObjectId id;
-    @Indexed(unique = true, background = true)
+    @Property
     private String url;
     @Property
     private List<String> children;
