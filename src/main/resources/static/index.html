@@ -11,17 +11,24 @@
     <form action="/search" method="post" id="searchForm">
       <input class="form-control" type="text" name="query" placeholder="Enter search query">
     </form>
-    <div>
-      <ul class="pagination">
-      </ul>
+    <div class="list-group" id="results">
     </div>
-    <script src="http://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E=" crossorigin="anonymous"></script>
+    <ul class="pagination">
+    </ul>
+    <script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.bundle.min.js" integrity="sha384-lZmvU/TzxoIQIOD9yQDEpvxp6wEU32Fy0ckUgOH4EIlMOCdR823rg4+3gWRwnX1M" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.2/jquery.form.min.js" integrity="sha384-FzT3vTVGXqf7wRfy8k4BiyzvbNfeYjK+frTVqZeNDFl8woCbF0CYG6g2fMEFFo/i" crossorigin="anonymous"></script>
     <script>
     $(function() {
-      $('#searchForm').ajaxForm(function(result) {
-        alert(result);
+      $('#searchForm').ajaxForm(function(results) {
+        results.forEach(function(result) {
+          $('#results').append(
+            '<a href="'+result.url+'" class="list-group-item list-group-item-action flex-column align-items-start">\
+              <h5 class="mb-1">'+result.title+'</h5>\
+              <p class="mb-1">'+result.snippet+'</p>\
+            </a>'
+          );
+        });
       });
     });
     </script>
