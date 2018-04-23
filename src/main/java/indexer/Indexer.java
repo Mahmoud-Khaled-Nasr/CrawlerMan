@@ -12,9 +12,9 @@ import java.util.logging.Logger;
  * The main class of the indexer package.
  * This class is intended to be used as static class with only static methods allowed.
  */
-public class Main {
+public class Indexer {
 
-    private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Indexer.class.getName());
     private static ExecutorService updateDocumentsDaemon;
     /**
      * The main indexer method.
@@ -61,7 +61,7 @@ public class Main {
     /**
      * A main method for the indexer to be run independently.
      */
-    public static void main (String[] args) throws InterruptedException {
+    public static void main (String[] args) {
         index();
     }
 }

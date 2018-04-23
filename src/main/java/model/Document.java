@@ -32,8 +32,4 @@ public class Document {
     public Map<String, Integer> getWords() {
         return words;
     }
-
-    public void setWords(Map<String, Integer> words) {
-        this.words = words;
-    }
 }

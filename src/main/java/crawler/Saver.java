@@ -52,7 +52,7 @@ class Saver implements Runnable {
                     continue;
                 }
                 links.add(link);
-                Main.submitNewLink(link);
+                Crawler.submitNewLink(link);
             }
             DatabaseController.sendURL(url, links);
         } catch (IOException e) {

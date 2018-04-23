@@ -42,14 +42,14 @@ public class Application {
         // Run Crawler
         Thread crawlerThread = new Thread(() -> {
             try {
-                crawler.Main.crawl(seedFileName, maxURLsCount, numberOfThreads);
+                crawler.Crawler.crawl(seedFileName, maxURLsCount, numberOfThreads);
             } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
             }
         });
 
         // Run Indexer
-        Thread indexerThread = new Thread(indexer.Main::index);
+        Thread indexerThread = new Thread(indexer.Indexer::index);
 
         // Waiting for them to finish
         crawlerThread.start();

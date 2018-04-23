@@ -51,7 +51,7 @@ public class Stemmer implements Runnable {
         LOGGER.info("Indexing " + urlId);
         try {
             String html = new String(Files.readAllBytes(PathGenerator.generate("HTML", String.valueOf(urlId))));
-            Main.updateDocument(urlId, stem(html));
+            Indexer.updateDocument(urlId, stem(html));
         } catch (IOException e) {
             e.printStackTrace();
         }

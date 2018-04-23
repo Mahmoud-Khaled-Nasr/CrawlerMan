@@ -12,9 +12,9 @@ import java.util.logging.Logger;
  * The main class of the crawler package.
  * This class is intended to be used as static class with only static methods allowed.
  */
-public class Main {
+public class Crawler {
 
-    private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Crawler.class.getName());
 
     // Services
     private static ExecutorService downloadersExecutor;

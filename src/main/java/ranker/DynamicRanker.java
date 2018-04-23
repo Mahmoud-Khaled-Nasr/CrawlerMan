@@ -31,9 +31,8 @@ public class DynamicRanker {
     }
 
     private static List<Integer> sortRelevanceMap (Map<Integer, Double> relevance){
-        List<Double> values = new ArrayList<>();
         List<Integer> sortedIds = new LinkedList<>();
-        values.addAll(relevance.values());
+        List<Double> values = new ArrayList<>(relevance.values());
         Collections.sort(values);
         for (Double value : values){
             for (Integer key : relevance.keySet()){
