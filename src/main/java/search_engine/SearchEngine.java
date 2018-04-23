@@ -8,8 +8,6 @@ import util.PathGenerator;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -49,24 +47,11 @@ public class SearchEngine {
     }
 
     // TODO better logic!
-    public static List<Result> search (String query, int page) throws InterruptedException {
-        final int PAGE_SIZE = 10;
-        List<URL> urls;
-        List<Result> pagedResults = new LinkedList<>();
+    public static List<URL> search (String query) throws InterruptedException {
         if(query.startsWith("\"") && query.endsWith("\"")) {
-            urls = phraseSearch(query.substring(1, query.length()-2));
+            return phraseSearch(query.substring(1, query.length()-2));
         } else {
-            urls = querySearch(query);
+            return querySearch(query);
         }
-        for (int i = page * PAGE_SIZE; i < urls.size() && i < page * PAGE_SIZE + PAGE_SIZE; i++) {
-            pagedResults.add(getResultFromURL(urls.get(i)));
-        }
-        return pagedResults;
-    }
-
-    private static Result getResultFromURL (URL url){
-        //TODO Change the title and snipped
-        //TODO get the string of the snippet from the file
-        return new Result(String.valueOf(url.getUrlId()), url.getURL(), String.valueOf(url.getUrlRank()));
     }
 }

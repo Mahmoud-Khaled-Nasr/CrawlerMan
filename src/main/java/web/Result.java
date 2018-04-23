@@ -1,4 +1,4 @@
-package search_engine;
+package web;
 
 public class Result {
 
