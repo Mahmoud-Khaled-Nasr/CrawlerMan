@@ -67,6 +67,6 @@ public class SearchEngine {
     private static Result getResultFromURL (URL url){
         //TODO Change the title and snipped
         //TODO get the string of the snippet from the file
-        return new Result("", url.getURL(), "");
+        return new Result(String.valueOf(url.getUrlId()), url.getURL(), String.valueOf(url.getUrlRank()));
     }
 }
