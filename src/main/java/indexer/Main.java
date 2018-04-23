@@ -5,6 +5,7 @@ import ranker.StaticRanker;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 /**
@@ -14,7 +15,7 @@ import java.util.logging.Logger;
 public class Main {
 
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
-
+    private static ExecutorService updateDocumentsDaemon;
     /**
      * The main indexer method.
      * It indexes the new URLs sent by the crawler via the database channel.
@@ -22,6 +23,8 @@ public class Main {
     public static void index() {
 
         LOGGER.info("Indexer is starting!");
+
+        updateDocumentsDaemon = Executors.newSingleThreadExecutor();
 
         ExecutorService stemmers = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         Map<Integer, Set<Integer>> newLinks = new HashMap<>();
@@ -42,14 +45,23 @@ public class Main {
         LOGGER.info("Indexer is trying to shut down normally!");
         stemmers.shutdown();
         StaticRanker.updateRanks(newLinks);
-
+        try {
+            assert updateDocumentsDaemon.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        updateDocumentsDaemon.shutdown();
         LOGGER.info("Indexer is shutting down normally!");
+    }
+
+    static void updateDocument (int urlId, List<String> words){
+        updateDocumentsDaemon.execute(() -> DatabaseController.updateDocument(urlId, words));
     }
 
     /**
      * A main method for the indexer to be run independently.
      */
-    public static void main (String[] args) {
+    public static void main (String[] args) throws InterruptedException {
         index();
     }
 }
