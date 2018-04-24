@@ -30,6 +30,10 @@ public class Word {
         occurrences.add(occurrence);
     }
 
+    public void removeOccurrence(Occurrence occurrence){
+        occurrences.remove(occurrence);
+    }
+
     public String getWord() {
         return word;
     }

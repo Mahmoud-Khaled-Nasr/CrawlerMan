@@ -45,7 +45,7 @@ class DatabaseController {
             List<Word> updatedWords = new LinkedList<>();
             List<Word> deletedWords = new LinkedList<>();
             List<Word> createdWords = new LinkedList<>();
-            List<Occurrence> deletedOccurrences = new LinkedList<>();
+            List<Word> deletedOccurrences = new LinkedList<>();
             for (Word word : wordsList) {
                 if (countedWords.get(word.getWord()) == null) {
                     //delete the old occurrence that don't exist anymore AND delete the word if there is no more occurrences
@@ -54,7 +54,8 @@ class DatabaseController {
                     } else {
                         for (Occurrence occurrence : word.getOccurrences()) {
                             if (occurrence.getUrlId().equals(urlId)) {
-                                deletedOccurrences.add(occurrence);
+                                word.removeOccurrence(occurrence);
+                                deletedOccurrences.add(word);
                                 break;
                             }
                         }
@@ -88,9 +89,8 @@ class DatabaseController {
                 createdWords.add(newRecord);
             }
 
-            // TODO double check these dumb lines
             DatabaseDriver.datastore.delete(Word.class, deletedWords);
-            DatabaseDriver.datastore.delete(Occurrence.class, deletedOccurrences);
+            DatabaseDriver.datastore.save(deletedOccurrences);
             DatabaseDriver.datastore.save(createdWords);
             DatabaseDriver.datastore.save(updatedWords);
             DatabaseDriver.datastore.save(existingNewDocumentWords);
