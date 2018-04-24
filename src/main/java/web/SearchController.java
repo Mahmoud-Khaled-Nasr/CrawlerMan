@@ -47,8 +47,8 @@ public class SearchController {
     private static Result getResultFromURL (URL url) throws IOException {
         try (BufferedReader file = new BufferedReader(new FileReader(PathGenerator.generate("HTML", String.valueOf(url.getUrlId())).toFile()))) {
             String title = file.readLine();
-            String snippet = url.getURL();
-            return new Result(title, url.getURL(), snippet);
+            String description = file.readLine();
+            return new Result(title, url.getURL(), description);
         }
     }
 }

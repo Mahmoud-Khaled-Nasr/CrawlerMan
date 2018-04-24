@@ -39,6 +39,12 @@ class Saver implements Runnable {
             } else {
                 file.println(url);
             }
+            Element description = document.select("meta[property=og:description]").first();
+            if (description != null) {
+                file.println(description.attr("content"));
+            } else {
+                file.println(url);
+            }
             Element body = document.select("body").first();
             if (body != null) {
                 file.println(body.text());

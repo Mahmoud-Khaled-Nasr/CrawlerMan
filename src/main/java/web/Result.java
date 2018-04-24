@@ -2,12 +2,12 @@ package web;
 
 public class Result {
 
-    private String title, url, snippet;
+    private String title, url, description;
 
-    Result(String title, String url, String snippet) {
+    Result(String title, String url, String description) {
         this.title = title;
         this.url = url;
-        this.snippet = snippet;
+        this.description = description;
     }
 
     public String getTitle() {
@@ -18,7 +18,7 @@ public class Result {
         return url;
     }
 
-    public String getSnippet() {
-        return snippet;
+    public String getDescription() {
+        return description;
     }
 }

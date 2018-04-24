@@ -88,11 +88,12 @@ class DatabaseController {
                 createdWords.add(newRecord);
             }
 
-            DatabaseDriver.datastore.delete(deletedWords);
-            DatabaseDriver.datastore.delete(deletedOccurrences);
-            DatabaseDriver.saveRecord(createdWords);
-            DatabaseDriver.saveRecord(updatedWords);
-            DatabaseDriver.saveRecord(existingNewDocumentWords);
+            // TODO double check these dumb lines
+            DatabaseDriver.datastore.delete(Word.class, deletedWords);
+            DatabaseDriver.datastore.delete(Occurrence.class, deletedOccurrences);
+            DatabaseDriver.datastore.save(createdWords);
+            DatabaseDriver.datastore.save(updatedWords);
+            DatabaseDriver.datastore.save(existingNewDocumentWords);
         }
     }
 
