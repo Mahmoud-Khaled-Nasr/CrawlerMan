@@ -57,7 +57,6 @@ class RobotRule {
         try {
             rulePattern = Pattern.compile(modifiedRule);
         }catch (Exception e){
-            e.printStackTrace();
             rulePattern = Pattern.compile("a");
         }
         Matcher matcher = rulePattern.matcher(relativeURL);
