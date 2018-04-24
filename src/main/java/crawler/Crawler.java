@@ -23,6 +23,7 @@ public class Crawler {
     private static final RobotMonitor robotMonitor = new RobotMonitor();
     private static final Set<String> visitedURLs = new HashSet<>();
     private static final Set<String> savedURLs = new HashSet<>();
+    private static final Object lock = new Object();
     private static int remainingURLsCount;
 
     /**
@@ -30,19 +31,21 @@ public class Crawler {
      * The link will be submitted for download if it is allowed and has never been visited before and the crawler still hasn't reached.
      * @param link The link to be inspected
      */
-    synchronized static void submitNewLink(String link) {
+    static void submitNewLink(String link) {
         int hashIndex = link.indexOf("#");
         if (hashIndex != -1) {
             link = link.substring(0, hashIndex);
         }
-        if (!downloadersExecutor.isShutdown()
-                && !visitedURLs.contains(link)
-                && remainingURLsCount > 0
-                && robotMonitor.isAllowed(link)) {
-            visitedURLs.add(link);
-            DatabaseController.crawling(link);
-            downloadersService.submit(new Downloader(link));
-            remainingURLsCount--;
+        synchronized (lock) {
+            if (!downloadersExecutor.isShutdown()
+                    && !visitedURLs.contains(link)
+                    && robotMonitor.isAllowed(link)
+                    && remainingURLsCount > 0) {
+                visitedURLs.add(link);
+                DatabaseController.crawling(link);
+                downloadersService.submit(new Downloader(link));
+                remainingURLsCount--;
+            }
         }
     }
 
@@ -87,8 +90,12 @@ public class Crawler {
             try {
                 document = downloadersService.take().get();
             } catch (ExecutionException e) {
-                maxURLsCount++;
-                remainingURLsCount++;
+                synchronized (lock) {
+                    if (remainingURLsCount > 0) {
+                        remainingURLsCount++;
+                        maxURLsCount++;
+                    }
+                }
                 continue;
             }
 
@@ -96,8 +103,12 @@ public class Crawler {
             String url = document.location();
             if (savedURLs.contains(url)) {
                 LOGGER.info("Ignoring a redirection duplicate " + url);
-                maxURLsCount++;
-                remainingURLsCount++;
+                synchronized (lock) {
+                    if (remainingURLsCount > 0) {
+                        remainingURLsCount++;
+                        maxURLsCount++;
+                    }
+                }
                 continue;
             }
 
