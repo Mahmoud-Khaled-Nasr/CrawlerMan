@@ -1,25 +1,24 @@
 package crawler.robot;
 
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class RobotRule {
+class RobotRule {
 
-    public static final String USER_AGENT_OPTION ="user-agent";
-    public static final String ALLOW_OPTION ="allow";
-    public static final String DISALLOW_OPTION ="disallow";
+    static final String USER_AGENT_OPTION ="user-agent";
+    static final String ALLOW_OPTION ="allow";
+    static final String DISALLOW_OPTION ="disallow";
     private static final Set<String> neededOptions = new HashSet<>(Arrays.asList(USER_AGENT_OPTION, ALLOW_OPTION, DISALLOW_OPTION));
     private String option, rule;
 
-    public String getOption() {
+    String getOption() {
         return option;
     }
 
-    public String getRule() {
+    String getRule() {
         return rule;
     }
 
@@ -29,7 +28,7 @@ public class RobotRule {
         this.rule = rule.substring(indexOfColon + 1, rule.length());
     }
 
-    public static boolean isNeededOption (String rule){
+    static boolean isNeededOption (String rule){
         int colonIndex = rule.indexOf(':');
         if (colonIndex == -1){
             //To handle wrong robots.txt malformation
@@ -39,7 +38,7 @@ public class RobotRule {
         return neededOptions.contains(option);
     }
 
-    public boolean pass(String relativeURL) {
+    boolean pass(String relativeURL) {
 
         if (rule.equals("")){
             return true;
@@ -59,14 +58,14 @@ public class RobotRule {
             rulePattern = Pattern.compile(modifiedRule);
         }catch (Exception e){
             e.printStackTrace();
-            rulePattern = Pattern.compile("\\*");
+            rulePattern = Pattern.compile("a");
         }
         Matcher matcher = rulePattern.matcher(relativeURL);
 
         return matcher.find();
     }
 
-    public int getRuleRank() {
+    int getRuleRank() {
         return (rule.split("/")).length;
     }
 }
