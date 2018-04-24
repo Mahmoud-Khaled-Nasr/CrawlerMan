@@ -28,9 +28,12 @@ class Downloader implements Callable<Document> {
         try {
             LOGGER.info("Downloading " + url);
             return Jsoup.connect(url).get();
+        } catch (Exception e){
+            LOGGER.info("Failed Downloading " + url);
+            throw e;
         } finally {
             DatabaseController.crawled(url);
-            LOGGER.info("Downloaded " + url);
+            LOGGER.info("Finish Downloading " + url);
         }
     }
 }
