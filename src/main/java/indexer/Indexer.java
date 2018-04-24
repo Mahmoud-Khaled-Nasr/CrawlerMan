@@ -62,6 +62,7 @@ public class Indexer {
      * A main method for the indexer to be run independently.
      */
     public static void main (String[] args) {
+        util.DatabaseDriver.initializeDatabase();
         index();
     }
 }

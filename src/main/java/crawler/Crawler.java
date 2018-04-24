@@ -129,6 +129,7 @@ public class Crawler {
         String seedFileName = args[0];
         int maxURLsCount = Integer.parseInt(args[1]);
         int numberOfThreads = Integer.parseInt(args[2]);
+        util.DatabaseDriver.initializeDatabase();
         crawl(seedFileName, maxURLsCount, numberOfThreads);
     }
 }

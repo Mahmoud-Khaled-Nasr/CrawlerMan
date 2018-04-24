@@ -33,7 +33,6 @@ public class StaticRanker {
         Set<Integer> graphChildren = new HashSet<>();
         List<Node> oldNodes = new LinkedList<>();
 
-        //TODO Hamdy can i use foreach here?
         for (Node node : graph) {
             Integer id = node.getUrlId();
             graphChildren.add(id);
