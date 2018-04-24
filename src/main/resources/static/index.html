@@ -6,50 +6,68 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link href="https://stackpath.bootstrapcdn.com/bootswatch/4.1.0/cyborg/bootstrap.min.css" rel="stylesheet" integrity="sha384-5KpNAytmiDxBanrkBv7mxkrUV1uggYCd+nLTGVig8i0ubJLVBFWQKXnGK5nR4kJF" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/awesomplete/1.1.2/awesomplete.css" rel="stylesheet" integrity="sha256-WucYll9Mn2FE68lRHrTpBwzWC+Ra3IeEok0re4TBmgc=" crossorigin="anonymous" />
   </head>
   <body>
-    <h1>Crawler Man</h1>
-    <form action="/search" method="post" id="searchForm">
-      <input class="form-control" type="text" name="query" id="query" placeholder="Enter search query">
-    </form>
-    <div class="list-group" id="results">
-    </div>
-    <ul class="pagination center-block" id="pages"></ul>
-    <script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.bundle.min.js" integrity="sha384-lZmvU/TzxoIQIOD9yQDEpvxp6wEU32Fy0ckUgOH4EIlMOCdR823rg4+3gWRwnX1M" crossorigin="anonymous"></script>
-    <script>
-      $(function() {
-        submitToServer = function(query, page) {
-          $.ajax({
-            type: 'POST',
-            url: '/search',
-            data: {"query": query, "page": page},
-            success: function(response) {
-              $('#results').empty();
-              response['results'].forEach(function(result) {
-                $('#results').append(
-                  '<a href="'+result.url+'" class="list-group-item list-group-item-action flex-column align-items-start">\
-                    <h5 class="mb-1">'+result.title+'</h5>\
-                    <p class="mb-1">'+result.snippet+'</p>\
-                  </a>'
-                );
-              });
-              $('#pages').empty();
-              for(i = 1; i <= response['pages']; i++) {
-                $('#pages').append(
-                  '<li class="page-item '+((i === page)?'active':'')+'">\
-                    <a class="page-link" href="javascript:submitToServer(\''+query+'\','+i+');">'+i+'</a>\
-                  </li>'
-                );
+    <div class="container">
+      <div class="center-block">
+        <h1>Crawler Man</h1>
+        <form action="/search" method="post" id="searchForm">
+          <input class="form-control" type="text" name="query" id="query" placeholder="Enter search query">
+        </form>
+      </div>
+      <div class="list-group" id="results">
+      </div>
+      <ul class="pagination center-block" id="pages"></ul>
+      <script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.bundle.min.js" integrity="sha384-lZmvU/TzxoIQIOD9yQDEpvxp6wEU32Fy0ckUgOH4EIlMOCdR823rg4+3gWRwnX1M" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/awesomplete/1.1.2/awesomplete.js" integrity="sha256-EArQ2ZQf8YMao9zH29xUvWT+CJI69MS937Gpg9BQSUQ=" crossorigin="anonymous"></script>
+      <script>
+        $(function() {
+          awesomplete = new Awesomplete(document.getElementById("query"));
+          updateSuggestions = function() {
+            $.ajax({
+              type: 'GET',
+              url: '/suggestions',
+              success: function(response) {
+                awesomplete.list = response;
               }
-            }
+            });
+          };
+          submitToServer = function(query, page) {
+            $.ajax({
+              type: 'POST',
+              url: '/search',
+              data: {"query": query, "page": page},
+              success: function(response) {
+                $('#results').empty();
+                response['results'].forEach(function(result) {
+                  $('#results').append(
+                    '<a href="'+result.url+'" class="list-group-item list-group-item-action flex-column align-items-start">\
+                      <h5 class="mb-1">'+result.title+'</h5>\
+                      <p class="mb-1">'+result.snippet+'</p>\
+                    </a>'
+                  );
+                });
+                $('#pages').empty();
+                for(i = 1; i <= response['pages']; i++) {
+                  $('#pages').append(
+                    '<li class="page-item '+((i === page)?'active':'')+'">\
+                      <a class="page-link" href="javascript:submitToServer(\''+query+'\','+i+');">'+i+'</a>\
+                    </li>'
+                  );
+                }
+                updateSuggestions();
+              }
+            });
+          };
+          $("#searchForm").submit(function(e) {
+            submitToServer($('#query').val(), 1);
+            e.preventDefault();
           });
-        };
-        $("#searchForm").submit(function(e) {
-          submitToServer($('#query').val(), 1);
-          e.preventDefault();
+          updateSuggestions();
         });
-      });
-    </script>
+      </script>
+    </div>
   </body>
 </html>

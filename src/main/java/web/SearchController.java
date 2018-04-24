@@ -2,6 +2,7 @@ package web;
 
 import model.URL;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import search_engine.SearchEngine;
@@ -15,8 +16,16 @@ import java.util.*;
 @RestController
 public class SearchController {
 
+    final static private Set<String> suggestions = new TreeSet<>();
+
+    @GetMapping("/suggestions")
+    public Set<String> getSuggestions() {
+        return suggestions;
+    }
+
     @PostMapping("/search")
     public Map<String, Object> search(@RequestParam(value = "query") String query, @RequestParam(value = "page", defaultValue="0") int page) throws InterruptedException, IOException {
+        suggestions.add(query);
         if(page > 0) {
             page--;
         }
