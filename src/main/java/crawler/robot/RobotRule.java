@@ -54,7 +54,13 @@ public class RobotRule {
 
         //Handling the * rules: Replace all the * in rule with \w* to work with the Matcher class
         String modifiedRule = rule.replaceAll("\\*", "\\\\\\w*");
-        Pattern rulePattern = Pattern.compile(modifiedRule);
+        Pattern rulePattern;
+        try {
+            rulePattern = Pattern.compile(modifiedRule);
+        }catch (Exception e){
+            e.printStackTrace();
+            rulePattern = Pattern.compile("\\*");
+        }
         Matcher matcher = rulePattern.matcher(relativeURL);
 
         return matcher.find();
