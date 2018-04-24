@@ -1,11 +1,15 @@
 package indexer;
 
+import crawler.Crawler;
 import model.*;
 import util.DatabaseDriver;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 class DatabaseController {
+
+    private static final Logger LOGGER = Logger.getLogger(Crawler.class.getName());
 
     static void updateDocument(int urlId, List<String> words) {
         Map<String, Integer> countedWords = new HashMap<>();
@@ -39,14 +43,14 @@ class DatabaseController {
             //if the document exists
             Map<String, Integer> currentDocumentWords = document.getWords();
             //Get all words in this document
-            List<Word> wordsList = DatabaseDriver.datastore.createQuery(Word.class).field("word")
+            List<Word> currentDocumentWordsObjectList = DatabaseDriver.datastore.createQuery(Word.class).field("word")
                     .in(currentDocumentWords.keySet()).asList();
 
             List<Word> updatedWords = new LinkedList<>();
             List<Word> deletedWords = new LinkedList<>();
             List<Word> createdWords = new LinkedList<>();
             List<Word> deletedOccurrences = new LinkedList<>();
-            for (Word word : wordsList) {
+            for (Word word : currentDocumentWordsObjectList) {
                 if (countedWords.get(word.getWord()) == null) {
                     //delete the old occurrence that don't exist anymore AND delete the word if there is no more occurrences
                     if (word.getOccurrences().size() <= 1) {
@@ -87,13 +91,29 @@ class DatabaseController {
                 Word newRecord = new Word(word);
                 newRecord.addNewOccurrence(new Occurrence(urlId, countedWords.get(word)));
                 createdWords.add(newRecord);
+                countedWords.remove(word);
             }
 
-            DatabaseDriver.datastore.delete(Word.class, deletedWords);
-            DatabaseDriver.datastore.save(deletedOccurrences);
-            DatabaseDriver.datastore.save(createdWords);
-            DatabaseDriver.datastore.save(updatedWords);
-            DatabaseDriver.datastore.save(existingNewDocumentWords);
+            //To check if there is no updates to add to the DB
+            List<Word> queriedWords = new LinkedList<>();;
+            if (!deletedWords.isEmpty()){
+                DatabaseDriver.datastore.delete(Word.class, deletedWords);
+            }
+            if (!deletedOccurrences.isEmpty()){
+                queriedWords.addAll(deletedOccurrences);
+            }
+            if (!createdWords.isEmpty()){
+                queriedWords.addAll(createdWords);
+            }
+            if (!updatedWords.isEmpty()){
+                queriedWords.addAll(updatedWords);
+            }
+            if (!existingNewDocumentWords.isEmpty()){
+                queriedWords.addAll(existingNewDocumentWords);
+            }
+            if (!queriedWords.isEmpty()) {
+                DatabaseDriver.datastore.save(queriedWords);
+            }
         }
     }
 
@@ -106,7 +126,7 @@ class DatabaseController {
     static String receiveURL (Set<String> links){
         while (DatabaseDriver.datastore.createQuery(Channel.class).count() == 0) {
             try {
-                Thread.sleep(10000);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
