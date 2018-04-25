@@ -4,6 +4,7 @@ import model.URL;
 import org.mongodb.morphia.query.FindOptions;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import util.DatabaseDriver;
 
 import java.io.FileNotFoundException;
@@ -11,8 +12,13 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
+
 @SpringBootApplication
+@EnableScheduling
 public class Application {
+
+    static String SEED_FILE_NAME;
+    static int MAX_DOUCMENTS_COUNT, NUMBER_OF_THREADS;
 
     /**
      * The main method for the application as a whole.
@@ -25,19 +31,16 @@ public class Application {
             System.exit(-1);
         }
 
-        String seedFileName = args[0];
-        int maxURLsCount = Integer.parseInt(args[1]);
-        int numberOfThreads = Integer.parseInt(args[2]);
+        SEED_FILE_NAME = args[0];
+        MAX_DOUCMENTS_COUNT = Integer.parseInt(args[1]);
+        NUMBER_OF_THREADS = Integer.parseInt(args[2]);
 
         util.DatabaseDriver.initializeDatabase();
 
         SpringApplication.run(Application.class);
-
-        update(seedFileName, maxURLsCount, numberOfThreads);
     }
 
-
-    private static void update(String seedFileName, int maxURLsCount, int numberOfThreads) throws InterruptedException, FileNotFoundException {
+    static void update(String seedFileName, int maxURLsCount, int numberOfThreads) throws InterruptedException, FileNotFoundException {
 
         // Run Crawler
         Thread crawlerThread = new Thread(() -> {
