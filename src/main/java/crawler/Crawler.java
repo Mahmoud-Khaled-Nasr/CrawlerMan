@@ -37,7 +37,7 @@ public class Crawler {
             link = link.substring(0, hashIndex);
         }
 
-        if (!downloadersExecutor.isShutdown() && robotMonitor.isAllowed(link)) {
+        if (!downloadersExecutor.isShutdown() && remainingURLsCount > 0 && !visitedURLs.contains(link) && robotMonitor.isAllowed(link)) {
             synchronized (lock) {
                 if (!visitedURLs.contains(link) && remainingURLsCount > 0) {
                     visitedURLs.add(link);

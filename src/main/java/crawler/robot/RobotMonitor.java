@@ -2,55 +2,39 @@ package crawler.robot;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 public class RobotMonitor {
 
-    final private Map <String, Robot> robots;
+    private Map <String, Robot> robots, pendingRobots;
     final private String USER_AGENT = "Crawler Man";
+    private static final Logger LOGGER = Logger.getLogger(RobotMonitor.class.getName());
 
     public RobotMonitor (){
-        this.robots = new HashMap<>();
+        this.robots = new ConcurrentHashMap<>();
+        this.pendingRobots = new ConcurrentHashMap<>();
     }
 
-    public boolean isAllowed (String url){
-        String baseURL ="";
+    public boolean isAllowed (String url) {
+        String baseURL = "";
         try {
             URL temp = new URL(url);
-            baseURL = temp.getProtocol()+ "://" + temp.getHost();
+            baseURL = temp.getProtocol() + "://" + temp.getHost();
         } catch (MalformedURLException e) {
-            System.out.println("Usage: RobotMonitor -> isAllowed Message: Malformed baseURL");
+            LOGGER.warning("Usage: RobotMonitor -> isAllowed Message: Malformed baseURL");
             e.printStackTrace();
-        }
-        Robot robot = getRobot(baseURL);
-        if (robot == null){
             return true;
         }
-        return robot.isAllowed(url);
+
+        Robot robot = getRobot(baseURL);
+        return robot == null || robot.isAllowed(url);
     }
 
-    private Robot getRobot (String baseURL){
-        String key ="";
-        synchronized (robots){
-            if (!robots.containsKey(baseURL)){
-                robots.put(baseURL, null);
-
-                for (String robotKey: robots.keySet()) {
-                    if (robotKey.equals(baseURL)){
-                        key = new String(robotKey);
-                        break;
-                    }
-                }
-            }else {
-                key = baseURL;
-            }
-        }
-        synchronized (key){
-            if (robots.get(key) == null){
-                robots.put(key, new Robot(USER_AGENT, key));
-            }
-            return robots.get(key);
-        }
+    private Robot getRobot (String baseURL) {
+        robots.putIfAbsent(baseURL, new Robot(USER_AGENT, baseURL));
+        return robots.get(baseURL);
     }
 }

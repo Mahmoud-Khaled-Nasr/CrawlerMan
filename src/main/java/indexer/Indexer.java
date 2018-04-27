@@ -26,17 +26,16 @@ public class Indexer {
 
         updateDocumentsDaemon = Executors.newSingleThreadExecutor();
 
-        ExecutorService stemmers = Executors.newFixedThreadPool( Runtime
-                .getRuntime().availableProcessors() - (Runtime.getRuntime().availableProcessors() / 2 ));
-        Map<Integer, Set<Integer>> newLinks = new HashMap<>();
+        ExecutorService stemmers = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        Map<Integer, Set<Integer>> newLinks = new TreeMap<>();
 
-        Set<String> links = new HashSet<>();
+        Set<String> links = new TreeSet<>();
         String url;
         while (!(url = DatabaseController.receiveURL(links)).equals("")) {
             int urlId = url.hashCode();
             DatabaseController.insertURL(urlId, url);
             stemmers.execute(new Stemmer(urlId));
-            Set<Integer> linksIds = new HashSet<>();
+            Set<Integer> linksIds = new TreeSet<>();
             for (String link : links) {
                 linksIds.add(link.hashCode());
             }

@@ -6,7 +6,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Robot {
+class Robot {
     final private String baseURL;
     final private String userAgent;
     private List<RobotRule> disallowedRules, allowedRules;
@@ -16,13 +16,12 @@ public class Robot {
     Robot (String userAgent, String baseURL){
         this.baseURL = baseURL;
         this.userAgent = userAgent;
-        this.allowedRules = new ArrayList<>();
-        this.disallowedRules = new ArrayList<>();
-        this.baseURLPattern = Pattern.compile(this.baseURL);
-        getRobotsTxt(this.baseURL);
+        this.allowedRules = null;
+        this.disallowedRules = null;
+        this.baseURLPattern = Pattern.compile(baseURL);
     }
 
-    private void getRobotsTxt(String baseURL){
+    private void getRobotsTxt(){
         String robotTxtFile="";
         try {
             robotTxtFile = Jsoup.connect(baseURL + "/robots.txt").get().wholeText();
@@ -75,6 +74,9 @@ public class Robot {
             disallowedRules.add(new RobotRule("disallow:/"));
             return;
         }
+        disallowedRules.add(new RobotRule("disallowed:*/*.*"));
+        allowedRules.add(new RobotRule("disallowed:*/*.html"));
+        allowedRules.add(new RobotRule("disallowed:*/*.htm"));
         for (int i = firstRuleIndex; i<= lastRuleIndex; i++){
             RobotRule robotRule = new RobotRule(rules.get(i));
             if (robotRule.getOption().equals(RobotRule.ALLOW_OPTION)){
@@ -86,7 +88,19 @@ public class Robot {
         }
     }
 
-    public boolean isAllowed (String url) {
+    synchronized private void downloadRobotsTxt (){
+        if (allowedRules == null && disallowedRules == null) {
+            allowedRules = new LinkedList<>();
+            disallowedRules = new LinkedList<>();
+            getRobotsTxt();
+        }
+    }
+
+    boolean isAllowed (String url) {
+        if (allowedRules == null || disallowedRules == null) {
+            downloadRobotsTxt();
+        }
+
         Matcher matcher = baseURLPattern.matcher(url);
         String relativeURL = matcher.replaceFirst("");
 
