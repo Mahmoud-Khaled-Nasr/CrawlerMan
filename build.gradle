@@ -44,12 +44,8 @@ repositories {
 
 run {
     if (project.hasProperty("appArgs")) {
-        println 'Running run 1'
+        mainClassName='web.Application'
+        println 'Running'
         args Eval.me(appArgs)
-    }else if (project.hasProperty("myAppArgs")) {
-        mainClassName = 'web.Application'
-        println 'Running run 2'
-        args Eval.me(myAppArgs)
     }
-
 }

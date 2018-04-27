@@ -124,14 +124,16 @@ class DatabaseController {
     }
 
     static String receiveURL (Set<String> links){
-        while (DatabaseDriver.datastore.createQuery(Channel.class).count() == 0) {
+        Channel channel = DatabaseDriver.datastore.createQuery(Channel.class).get();
+        while (channel == null) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            channel = DatabaseDriver.datastore.createQuery(Channel.class).get();
         }
-        Channel channel = DatabaseDriver.datastore.createQuery(Channel.class).get();
+
         DatabaseDriver.datastore.delete(channel);
         if (channel.getURL().equals("")
                 && DatabaseDriver.datastore.createQuery(Channel.class).count() != 0) {
