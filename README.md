@@ -7,5 +7,9 @@ A crawler-based search engine.
 
 ## Running the application
 ```shell
-./gradlew run -PappArgs="['<seed_file>', '<max_URLs_count>', '<number_of_threads>']"
+gradle (./gradlew) run -PappArgs="['<seed_file>', '<max_URLs_count>', '<number_of_threads>']"
+```
+### Example
+```shell
+gradle (./gradlew) run -PappArgs="['seed.txt',1000,3]"
 ```
