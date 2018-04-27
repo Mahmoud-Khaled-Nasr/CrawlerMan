@@ -3,6 +3,7 @@ package crawler.robot;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -11,7 +12,7 @@ class RobotRule {
     static final String USER_AGENT_OPTION ="user-agent";
     static final String ALLOW_OPTION ="allow";
     static final String DISALLOW_OPTION ="disallow";
-    private static final Set<String> neededOptions = new HashSet<>(Arrays.asList(USER_AGENT_OPTION, ALLOW_OPTION, DISALLOW_OPTION));
+    private static final Set<String> neededOptions = new TreeSet<>(Arrays.asList(USER_AGENT_OPTION, ALLOW_OPTION, DISALLOW_OPTION));
     private String option, rule;
 
     String getOption() {

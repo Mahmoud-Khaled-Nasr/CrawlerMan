@@ -3,19 +3,17 @@ package crawler.robot;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 public class RobotMonitor {
 
-    private Map <String, Robot> robots, pendingRobots;
+    private Map <String, Robot> robots;
     final private String USER_AGENT = "Crawler Man";
     private static final Logger LOGGER = Logger.getLogger(RobotMonitor.class.getName());
 
     public RobotMonitor (){
         this.robots = new ConcurrentHashMap<>();
-        this.pendingRobots = new ConcurrentHashMap<>();
     }
 
     public boolean isAllowed (String url) {

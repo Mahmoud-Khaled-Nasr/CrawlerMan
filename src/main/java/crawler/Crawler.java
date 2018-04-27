@@ -21,8 +21,8 @@ public class Crawler {
     private static CompletionService<Document> downloadersService;
     private static ExecutorService saversExecutor;
     private static final RobotMonitor robotMonitor = new RobotMonitor();
-    private static final Set<String> visitedURLs = new HashSet<>();
-    private static final Set<String> savedURLs = new HashSet<>();
+    private static final Set<String> visitedURLs = new TreeSet<>();
+    private static final Set<String> savedURLs = new TreeSet<>();
     private static final Object lock = new Object();
     private static int remainingURLsCount;
 
@@ -66,7 +66,7 @@ public class Crawler {
         saversExecutor = Executors.newFixedThreadPool(numberOfThreads);
 
         // Load state
-        Set<String> URLs = new HashSet<>();
+        Set<String> URLs = new TreeSet<>();
         DatabaseController.loadState(URLs, visitedURLs);
         maxURLsCount -= visitedURLs.size();
         if (URLs.isEmpty()) { // Read seed file

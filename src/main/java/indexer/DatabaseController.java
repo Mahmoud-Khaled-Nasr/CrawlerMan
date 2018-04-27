@@ -12,7 +12,7 @@ class DatabaseController {
     private static final Logger LOGGER = Logger.getLogger(Crawler.class.getName());
 
     static void updateDocument(int urlId, List<String> words) {
-        Map<String, Integer> countedWords = new HashMap<>();
+        Map<String, Integer> countedWords = new TreeMap<>();
         //Count the frequency of a word in document
         for (String word : words) {
             countedWords.put(word, countedWords.getOrDefault(word, 0) + 1);

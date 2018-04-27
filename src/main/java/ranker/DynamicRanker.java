@@ -14,7 +14,7 @@ public class DynamicRanker {
 
     static public List<Integer> getRankSortedUrls (List<String> query){
         List<Word> words = DatabaseController.getWords(query);
-        Map<Integer, Double> relevance = new HashMap<>();
+        Map<Integer, Double> relevance = new TreeMap<>();
 
         for (Word word : words){
             List<Occurrence> occurrenceList = word.getOccurrences();

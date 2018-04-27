@@ -30,7 +30,7 @@ public class StaticRanker {
         //Get nodes that needs updating
 
         Set<Integer> newLinksKeySet = newLinks.keySet();
-        Set<Integer> graphChildren = new HashSet<>();
+        Set<Integer> graphChildren = new TreeSet<>();
         List<Node> oldNodes = new LinkedList<>();
 
         for (Node node : graph) {
@@ -73,8 +73,8 @@ public class StaticRanker {
     private static Map<Integer, Double> updateGraphRanks () {
         LOGGER.info("updating Graph Ranks!");
         graph = DatabaseController.getGraph();
-        Map<Integer, Double> ranks = new HashMap<>();
-        Map<Integer, Double> oldRanks = new HashMap<>();
+        Map<Integer, Double> ranks = new TreeMap<>();
+        Map<Integer, Double> oldRanks = new TreeMap<>();
 
         //set the default ranks to 1
         for (Node node : graph) {
@@ -83,7 +83,7 @@ public class StaticRanker {
 
         //Calculate the Ranks
         for (int i = 0; i < PAGE_RANK_ITERATIONS; i++) {
-            ranks = new HashMap<>();
+            ranks = new TreeMap<>();
             for (Node node : graph) {
                 ranks.put(node.getUrlId(), INITIAL_RANK);
             }

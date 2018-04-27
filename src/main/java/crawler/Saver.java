@@ -6,8 +6,8 @@ import util.PathGenerator;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Logger;
 
 /**
@@ -50,7 +50,7 @@ class Saver implements Runnable {
                 file.println(body.text());
             }
 
-            Set<String> links = new HashSet<>();
+            Set<String> links = new TreeSet<>();
             for (Element element : document.select("a[href]")) {
                 String link = element.absUrl("href");
 
