@@ -26,7 +26,8 @@ public class Indexer {
 
         updateDocumentsDaemon = Executors.newSingleThreadExecutor();
 
-        ExecutorService stemmers = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() / 2);
+        ExecutorService stemmers = Executors.newFixedThreadPool( Runtime
+                .getRuntime().availableProcessors() - (Runtime.getRuntime().availableProcessors() / 2 ));
         Map<Integer, Set<Integer>> newLinks = new HashMap<>();
 
         Set<String> links = new HashSet<>();

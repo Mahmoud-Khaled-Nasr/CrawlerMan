@@ -36,15 +36,15 @@ public class Crawler {
         if (hashIndex != -1) {
             link = link.substring(0, hashIndex);
         }
-        synchronized (lock) {
-            if (!downloadersExecutor.isShutdown()
-                    && !visitedURLs.contains(link)
-                    && robotMonitor.isAllowed(link)
-                    && remainingURLsCount > 0) {
-                visitedURLs.add(link);
-                DatabaseController.crawling(link);
-                downloadersService.submit(new Downloader(link));
-                remainingURLsCount--;
+
+        if (!downloadersExecutor.isShutdown() && robotMonitor.isAllowed(link)) {
+            synchronized (lock) {
+                if (!visitedURLs.contains(link) && remainingURLsCount > 0) {
+                    visitedURLs.add(link);
+                    DatabaseController.crawling(link);
+                    downloadersService.submit(new Downloader(link));
+                    remainingURLsCount--;
+                }
             }
         }
     }
@@ -61,7 +61,7 @@ public class Crawler {
 
         LOGGER.info("Crawler is starting!");
 
-        downloadersExecutor = Executors.newFixedThreadPool(numberOfThreads / 2);
+        downloadersExecutor = Executors.newFixedThreadPool(numberOfThreads);
         downloadersService = new ExecutorCompletionService<>(downloadersExecutor);
         saversExecutor = Executors.newFixedThreadPool(numberOfThreads);
 

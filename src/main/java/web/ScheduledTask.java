@@ -14,10 +14,10 @@ public class ScheduledTask {
     private static final Logger LOGGER = Logger.getLogger(ScheduledTask.class.getName());
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
-    @Scheduled(fixedDelay = 100000)
+    @Scheduled(fixedDelay = 60000)
     public void runTheCrawlerAndIndexer() throws FileNotFoundException, InterruptedException {
-        LOGGER.warning("The scheduled crawler and indexer are running now " + dateFormat.format(new Date()));
+        LOGGER.warning("The scheduled run of crawler and indexer is atarting now " + dateFormat.format(new Date()));
         Application.update(Application.SEED_FILE_NAME, Application.MAX_DOUCMENTS_COUNT, Application.NUMBER_OF_THREADS);
+        LOGGER.warning("The scheduled run of crawler and indexer is shutting down normally now " + dateFormat.format(new Date()));
     }
-
 }
